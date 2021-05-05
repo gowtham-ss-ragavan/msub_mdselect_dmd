@@ -4,7 +4,7 @@
 (*untested*)
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*Explicit computation of right eigenvectors of a Companion matrix*)
 
 
@@ -18,7 +18,7 @@ scales = MapThread[(getgpvec[#1,clen-1].#2)&,{vals,vecs}];
 getCompanionEvecs[vals_]:= getCompanionEvecs[vals, Length[vals]];
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*Update the numerical checks for mode-selection theorems using estimatruevals*)
 
 
@@ -33,45 +33,47 @@ MapThread[numchks4msubthrms[zmat2xmat[#1],#2,#3,sigtols]&,{dataorgs,evalparts,lo
 
 
 (* ::Subsubsection:: *)
-(*Generating data to help choose n  >= r that can catch the richness of the DS*)
+(*Drop unorganized elements of the list of associations named vals*)
 
 
-(* ::Item:: *)
-(*For "n" ranging from cdegmin\[LongRightArrow] cdegmax,  *)
+onlythequads[vals_] := vals[[All,(* Lose the other Keys as they may not ahve as man elements as in these three *){Key[cquads], Key[ratequads], Key[equads]}]];
+
+
+(* ::Subsubsection:: *)
+(*Generating data to help choose \hat{r} : The approximate dimension of the underlying invariant subspace*)
 
 
 (* ::Subitem:: *)
-(*Find the "r" (rmin) estimated eigenvalues using Algorithm 6.1*)
+(*Compute the pair-wise \rho_{Subset} over the range of "n" under purview*)
 
 
-(* ::Subsubitem:: *)
-(*True eigenvalues known : Find the Hausdorff distance of the estimated lot to the truth*)
+(* ::Subitem:: *)
+(*Will then need to UpperTriangularize, as we are interested in the smaller being contained in the larger set*)
 
 
-(* ::Subsubitem:: *)
-(*If not, compute the pair-wise Hausdorff distances over the range of "n" under purview*)
-
-
-getetvdepwrtcdeg[vals_,cgrubin_,cdegmin_,cdegmax_,truevals_]:=Module[{cgrub = cgrubin,localetvs,dt2truth},
-localetvs = Table[(AssociateTo[cgrub,chosendeg-> i];sneakyestimatetruevals[vals,cgrub,"brevity"]),{i,cdegmin,cdegmax}];
-dt2truth = Map[hausdorffdist[#,truevals]&,localetvs];
-ListPlot[{Range[cdegmin,cdegmax],splog10[dt2truth]}\[Transpose],PlotRange-> All]
-];
-
-
-getetvdepwrtcdeg[vals_,cgrubin_,cdegmin_,cdegmax_]:=Module[{cgrub = cgrubin,localetvs,pairdts},
-localetvs = Table[(AssociateTo[cgrub,chosendeg-> i];sneakyestimatetruevals[vals,cgrub,"brevity"]),{i,cdegmin,cdegmax}];
-pairdts = Outer[hausdorffdist,localetvs,localetvs,1];
-MatrixPlot[splog10[pairdts],PlotRange->All,PlotLegends->Automatic,FrameLabel->(*{{cdegmin,cdegmax},{cdegmin,cdegmax}},AxesLabel\[Rule]*)None]
-];
-
+getetvdepwrtcdeg[vals_, cgrubin_] := Module[{cgrub = cgrubin, localetvs, pairdts, plotcoords, zcoords, locvals},
+	(*Common eigenvalues,over ICs and permitted delays,at varying choices of n*)
+	localetvs = 
+	Table[(
+		AssociateTo[cgrub, {chosendeg -> i,(*Want all the eigenvalues for a chosen value of n (chosendeg)*)rmin -> i, delaymin -> i - 1}];
+        locvals = keepthemgoodelays[onlythequads[vals], cgrub]; 
+        sneakyestimatetruevals[locvals, cgrub, "brevity"]
+        ), 
+   {i, cgrubin[testdegs]}];
+   (*Want to know how much the low dimensional estimates are contained in the high dimensional versions*)(*So,first compute the pair-wise values of \rho_{Subset}*)
+   pairdts = Outer[pert4lhsinrhs, localetvs, localetvs, 1];
+   plotcoords = Flatten[Outer[{##} &, cgrubin[testdegs], cgrubin[testdegs]], 1];
+   (*Assuming the first coordinate represents the first argument,we zero out all those with a larger first argument,AFTER taking a log10*)
+   zcoords = Flatten@UpperTriangularize@splog10[pairdts];
+   ldplot[plotcoords, zcoords, {"Bigger n", "Smaller n"}, {(*Skip the diagonals*)-12, -0.01 (*Skip the zeros*)}, "TemperatureMap"(* A more vivid color scheme than the default*)]
+   ];
 
 
 (* ::Section:: *)
 (*Mean sub mods*)
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*Lift points iff they are within an origin centered hypercube*)
 
 
@@ -90,7 +92,7 @@ index = 1;
 ];
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*MOD: Lift indiscriminately*)
 
 
@@ -109,7 +111,7 @@ index = 1;
 basislift[mat_,params_,flavour_]:=params[[-1]].(naivebasislift[mat,Most[params],flavour]);
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*Parameter generation for different choices of dictionaries*)
 
 
@@ -143,7 +145,7 @@ getparamsplus[dummyvars_,obsdim_,liftgrub_]:=getparamsplus[dummyvars,liftgrub[fl
 (*meansuboneshot*)
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*No structing*)
 
 
@@ -209,7 +211,7 @@ opgrub
 ];
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*Structed*)
 
 
@@ -269,7 +271,7 @@ meansuboneshot@@args
 (*Logistical spawn*)
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*MOD: Random matrices with condition number = 1 when \[CapitalSigma] unspecified*)
 
 
@@ -282,14 +284,14 @@ getrandmat[m_, n_, {r_, sigmas_}] := Module[{buffer, sigs},
    ];
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*Layering functions on 3D arrays*)
 
 
 makecratesfunny[layer1fun_, layer2fun_, crates_] := ParallelMap[layer1fun, Transpose[Map[layer2fun, crates], {3, 1, 2}], {2}];
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*Attach scalar attributes to a list of (x,y) coordinates*)
 
 
@@ -300,7 +302,29 @@ getxyzlist[xylist_, zlist_] := Append[xylist\[Transpose], zlist]\[Transpose];
 (*ListDensityPlot of coordinate list {(y,x)} with corresponding attributes {z}*)
 
 
-ldplot[deldegcoords_, zcoords_] := ListDensityPlot[getxyzlist[Reverse[deldegcoords, 2](* X :n, Y : #[delays] *), Flatten[zcoords ]], InterpolationOrder -> 0, PlotLegends -> Automatic, FrameLabel -> {"n", "#[delays]"}, PlotRange -> All, PerformanceGoal -> "Quality", LabelStyle -> Directive[Black, 15]];
+(* ::Text:: *)
+(*Generic version used to visualize variation of \rho_{Subset}[Estimate_{i},Estimate_{j}] as i,j range over the DMD model orders under study*)
+
+
+ldplot[deldegcoords_,coordvalues_,framelabel_,plotrange_,colourfun_]:=Module[{xycoords,zcoords,xrange,yrange,regfun,ldpin},
+xycoords=Reverse[deldegcoords,2];(*X:n,Y:#[delays]*)
+zcoords=Flatten[coordvalues];
+(*Generate the list of 3D coordinates requiredc for ListDensityPlot*)
+ldpin=getxyzlist[xycoords,zcoords];
+(* Sometimes ListDensityPlot extrapolates a bit outside what is given *)
+(* Hence, we create a RegionFunction to do just that*)
+{xrange,yrange} = Map[MinMax,xycoords\[Transpose]];
+regfun= Function[{x,y,z},xrange[[1]] <= x <= xrange[[2]] && yrange[[1]] <= y <= yrange[[2]]];
+(* Combine all options in the plot*)
+ListDensityPlot[ldpin,InterpolationOrder->0,PlotLegends->Automatic,FrameLabel->framelabel,PlotRange->plotrange,PerformanceGoal->"Quality",LabelStyle->Directive[Black,15],RegionFunction->regfun,ColorFunction->colourfun]
+];
+
+
+(* ::Text:: *)
+(*Specifically for the heat maps*)
+
+
+ldplot[deldegcoords_,zcoords_]:=ldplot[deldegcoords,zcoords,{"n","#[delays]"},All,Automatic];
 
 
 (* ::Subsubsection:: *)
@@ -325,3 +349,15 @@ getclusterplot[zmat_, zmatindices_, nclusters_] := Module[{zmatclusters, cluster
    clusteredzmat = zmatindices /. Flatten@MapThread[(*Points in the same cluster are assigned the same value from 1 to nclusters *)Thread[#1 -> #2] &, {zmatclusters, Range[nclusters]}];
    ldplot[zmatindices, clusteredzmat]
    ];
+
+
+(* ::Subsubsection:: *)
+(*Generate heat-maps of numerical checks from vals*)
+
+
+vals2plotopsVScases[vals_,crunchcoords_,ncases_]:=Module[{casewiserates,opsVScases,funnyopsVScases,plotopsVScases},
+casewiserates = (* Case, IC,del,deg*)Table[ Map[(#[ratequads])[[All,All,i]]&,vals],{i,ncases}];opsVScases = Table[casewiserates[[j,All,All,All,i]],{i,3}(* PDF, rperror, respercent *),{j,ncases}(* Vanilla, MS, MS + Pres, MS + Delay *)];
+funnyopsVScases = Map[makecratesfunny[Mean,#&,#]&,Rest[opsVScases],{2}];
+plotopsVScases = Map[ldplot[crunchcoords,splog10@#]&,funnyopsVScases ,{2}];
+MatrixForm[plotopsVScases\[Transpose]]
+]

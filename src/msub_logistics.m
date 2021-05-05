@@ -15,7 +15,7 @@ ms1shot4trajvariations[trajgrubIP_, liftgrub_, priorsgrub_, testpriorsgrub_, cru
    ];
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*Generating an IC with specific non-zeros*)
 
 
@@ -30,7 +30,7 @@ ms1shot4trajvariations[trajgrubIP_, liftgrub_, priorsgrub_, testpriorsgrub_, cru
 getic[ssdim_,nprojs_]:=(*Permute the randomly generated so we spread out the zeros from the end*)RandomSample@(PadRight[(RandomReal[{1,5}(* Trying to keep the ICs within the same order *),nprojs]*RandomChoice[{-1,1}(* Flip signs at random*),nprojs]),ssdim (*Make of correct size*)]);
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*A plotters digression*)
 
 
@@ -83,7 +83,7 @@ autofigure[style_,grub__]:=autoplotcore[head4apcore[style],grub];
 gildedfigure[listplotdat_,parplotdat_,optchoices_]:=Labeled[Show[MapThread[autofigure[##,optchoices]&,{{"listplot","parametricplot"},(* See head4mpthrd for how to format this data *){listplotdat,parplotdat}}],PlotRange-> All],optchoices[[1]],Top, LabelStyle->optchoices[[3]]];
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*How to create dummy vals for the sake of testing*)
 
 
@@ -105,15 +105,30 @@ getdummyvals[delays_,degs_,truevals_,nics_]:=Table[(* Generate Association for e
 (*Extracting parts of vals (Data structure used in scripts)*)
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*c* for plain DMD @ a particular degree*)
 
 
 vals2vanillactes[vals_,degindex_]:=Flatten[Map[(#[equads])[[All,degindex,1]]&,vals],1];
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*Residue info for plain DMD @ a particular degree*)
 
 
 vals2vanillacvecs[vals_,degindex_]:=Flatten[Map[(#[cquads])[[All,degindex,1]]&,vals],1];
+
+
+(* ::Subsubsection::Closed:: *)
+(*Prunes the delays so that the rest have a consistent jump index*)
+
+
+(* ::Item:: *)
+(*Needs crunchgrub to have the info on the minimum number of delays to take in delaymin*)
+
+
+keepthemgoodelays[vals_, crunchgrub_] := Module[{goodstart},
+   (* Find the index within testdelays that corresponds to delaymin *)
+   goodstart = (Position[crunchgrub[testdelays],crunchgrub[delaymin]])[[1, 1]];
+   vals[[All(*ICs*), All(*Keys within each Association *),(*Delays*)goodstart ;; -1]]
+   ];
