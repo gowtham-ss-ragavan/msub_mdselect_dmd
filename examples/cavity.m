@@ -29,7 +29,7 @@
 
 
 (* ::Input:: *)
-(*AssociateTo[trajgrub, vfield-> "13k"]; *)
+(*AssociateTo[trajgrub, vfield-> "20k"]; *)
 
 
 (* ::Subsubsection::Closed:: *)
@@ -44,15 +44,7 @@
 (*Computations*)
 
 
-(* ::Subchapter::Closed:: *)
-(*First run *)
-
-
-(* ::Text:: *)
-(*No pre-existing save files*)
-
-
-(* ::Section:: *)
+(* ::Section::Closed:: *)
 (*Temporal parameters*)
 
 
@@ -69,7 +61,7 @@
 
 
 (* ::Input:: *)
-(*AssociateTo[plotgrub,{mindelays-> 0, minn-> 2,maxdelays->9,maxn-> 25}];*)
+(*AssociateTo[plotgrub,{mindelays-> 0, minn-> 2,maxdelays->25,maxn-> 25}];*)
 
 
 (* ::Subsubsection::Closed:: *)
@@ -194,7 +186,7 @@
 
 
 (* ::Item:: *)
-(*nfunda : Parameters used to decide when Case 1 can occur, and accordingly change the reference for Subscript[\[Rho], Subset] and Subscript[\[Delta], Trivial] using  getevalpartitions (See Table 6.1)*)
+(*nfunda : Parameters used to decide when Case 1 can occur, and accordingly change the reference for  \[Rho]_{Subset} and \[Delta]_{Trivial} using  getevalpartitions (See Table 6.1)*)
 
 
 (* ::Subitem:: *)
@@ -284,33 +276,12 @@
 (*Flavours  (Redundant)*)
 
 
-
-
 (* ::Input:: *)
-(*(* AppendTo[userlist,(*Desired fheads*)];*)*)
-(**)
 (*AssociateTo[priorsgrub,userparams ->  {}];*)
 
 
-
-(* ::Item:: *)
-(*Should be a LIST of matrices !!!*)
-
-
 (* ::Input:: *)
-(*AssociateTo[priorsgrub,{(*(*  *)*)
-(*invsamplesets \[Rule] {},*)
-(*(*  *)*)
-(*ipfuns(**)\[Rule] {},*)
-(*opfuns(**)\[Rule] {},*)*)
-(*rawuserlist ->  {}}];*)
-
-
-(* ::Input:: *)
-(*(*AssociateTo[testpriorsgrub,{*)
-(*testinvsamplesets \[Rule] {},*)
-(*testipfuns \[Rule] {},*)
-(*testopfuns \[Rule] {}}];*)*)
+(*AssociateTo[priorsgrub,{rawuserlist ->  {}}];*)
 
 
 (* ::Input:: *)
@@ -357,11 +328,11 @@
 
 
 (* ::Input:: *)
-(*nICs =11;*)
+(*nICs =30;*)
 
 
 (* ::Subsubsection::Closed:: *)
-(*Generate a list of trajectories*)
+(*Generate a list of trajectories (special to cavity)*)
 
 
 (* ::Input:: *)
@@ -392,11 +363,7 @@
 
 
 (* ::Section:: *)
-(*First computing run*)
-
-
-(* ::Subsection::Closed:: *)
-(*Initial analysis without truevals : Pick the appropriate section to run*)
+(*Analyse each trajectory, for all possible hyper-parameters.*)
 
 
 (* ::Input:: *)
@@ -411,26 +378,27 @@
 (*Print[AbsoluteTime[]];*)
 
 
+(* ::Subsubsection:: *)
+(*Save progress*)
+
+
 (* ::Input:: *)
 (*DumpSave[crunchgrub[savefile],{vals,crunchgrub,trajgrub,liftgrub,priorsgrub,testpriorsgrub,basicolourlist,listoICs,plotgrub,simsteps}];*)
 
 
-(* ::Subchapter::Closed:: *)
-(*Later runs (i.e a savefile exists)*)
+(* ::Chapter::Closed:: *)
+(*Restore-point #1*)
 
 
 (* ::Input:: *)
-(*(**)
-(*Get[crunchgrub[savefile]];*)
+(*(*Get[crunchgrub[savefile]];*)
 (*(* Load the velocityfield data *)*)
 (*Get[trajgrub[prunedata]];*)
 (*(* Generate your trajectories *)*)
-(*listotseries = Map[((velocityfield[cavityPsi])[[All,Range[0,simsteps]+#]])\[Transpose](* Trasnpose coz the cavityPsi is in snapshot form *)&,listoICs];*)*)
-(**)
-
-
-(* ::PageBreak:: *)
-(**)
+(*listotseries = Map[((velocityfield[cavityPsi])[[All,Range[0,simsteps]+#]])\[Transpose](* Trasnpose coz the cavityPsi is in snapshot form *)&,listoICs];*)
+(*(* UNdo all changes *)*)
+(*If[ValueQ[oldvals],liftgrub[truevals]={};*)
+(*KeyDropFrom[crunchgrub,{rmin,delaymin,chosendeg}];vals = oldvals];*)*)
 
 
 (* ::Chapter:: *)
@@ -438,7 +406,7 @@
 
 
 (* ::Section:: *)
-(*Subscript[c, ms] transition*)
+(*DMD-DFT transition*)
 
 
 (* ::Subsubsection::Closed:: *)
@@ -446,7 +414,7 @@
 
 
 (* ::Text:: *)
-(*Compute \!\(\*SubsuperscriptBox[\(\[Delta]\), \(rel\), \(\[Mu]\)]\)*)
+(*Compute \delta_{rel}^{\mu}*)
 
 
 (* ::Input:: *)
@@ -454,7 +422,7 @@
 
 
 (* ::Text:: *)
-(*Collect \[Kappa](X),Subscript[\[Sigma], tail](X)*)
+(*Collect \[Kappa](X),\sigma_{tail}(X)*)
 
 
 (* ::Input:: *)
@@ -471,33 +439,37 @@
 
 
 (* ::Input:: *)
-(*BarLegend[{basicolourlist,Through[{Min,Max}[crunchgrub[testdelays]]]},crunchgrub[testdelays],LegendLabel->"#[delays]"]*)
-
-
-(* ::Item:: *)
-(*Delays reduce the jump gap from 10^15\[LongRightArrow]10^5 : LTI 1, LTI 2, LTI 3*)
+(*delayscolored=BarLegend[{basicolourlist,Through[{Min,Max}[crunchgrub[testdelays]]]},crunchgrub[testdelays],LegendLabel->"#[delays]"];*)
 
 
 (* ::Input:: *)
 (*tplots=MapThread[BoxWhiskerChart[splog10[#1],ChartStyle->#2,ChartLabels-> crunchgrub[testdegs],ImageSize->Large,PlotRange->All,LabelStyle->Directive[Black, Medium]]&,{ensembledat,basicolourlist}];*)
-(*(*Manipulate[tplots[[i]],{i,1,25,1}]*)*)
+
+
+(* ::Input:: *)
+(*(*lengthoftplots=Length@tplots;*)
+(*Manipulate[tplots[[i]],{i,1,lengthoftplots,1}]*)*)
 
 
 (* ::Subsection:: *)
-(*\delta_{rel}^{\mu} Vs n*)
+(* Deviation of mean-subtracted DMD from DFT Vs Order of DMD model (n)*)
+
+
+(* ::Item:: *)
+(*Find \hat{r}_{min}, \hat{r}_{max} so that when at least n_{max}-1 delays are taken,  the jump in the indicator  occurs for  \hat{r}_{min} <=  n <= \hat{r}_{max}*)
 
 
 (* ::Input:: *)
 (*transitplot=(Show[##,PlotRange-> All]&)@@(tplots);*)
-(*Show[transitplot,FrameLabel->{{HoldForm[Subscript[Log, 10][\!\(\*SubsuperscriptBox[\(\[Delta]\), \(rel\), \(\[Mu]\)]\)]],None},{HoldForm[n],None}},PlotLabel->None,LabelStyle->{Directive[Black, Medium]}]*)
+(*(*Put the correct legend *)(Legended[#,delayscolored]&)@(*On this bunch of plots that have been overlaid *)Show[transitplot,FrameLabel->{{HoldForm[Subscript[Log, 10][\!\(\*SubsuperscriptBox[\(\[Delta]\), \(rel\), \(\[Mu]\)]\)]],None},{HoldForm[n],None}},PlotLabel->None,LabelStyle->{Directive[Black, Medium]}]*)
 
 
 (* ::Subsubsection:: *)
-(*\sigma_{Tail} Vs n*)
+(*Tail of SVD lost in truncation Vs Order of DMD model (n)*)
 
 
 (* ::Input:: *)
-(*(Show[##,PlotRange-> All]&)@@(MapThread[BoxWhiskerChart[splog10[#1],ChartStyle->#2,ChartLabels-> crunchgrub[testdegs],ImageSize->Large,PlotRange->All,LabelStyle->Directive[Black, Medium]]&,{ensemblechoppeddat,basicolourlist}])*)
+(*(Legended[#,delayscolored]&)@((Show[##,PlotRange-> All]&)@@(MapThread[BoxWhiskerChart[splog10[#1],ChartStyle->#2,ChartLabels-> crunchgrub[testdegs],ImageSize->Large,PlotRange->All,LabelStyle->Directive[Black, Medium]]&,{ensemblechoppeddat,basicolourlist}]))*)
 
 
 (* ::Section:: *)
@@ -505,82 +477,41 @@
 
 
 (* ::Subsection:: *)
-(*Look at \delta_{rel}^{\mu} Vs n and pick the smallest x-coordinate with a large median / the dimension of the underlying system if known*)
-
-
-(* ::Item:: *)
-(*Reduce your guess if indicators below are unsatisfactory*)
-
-
-(* ::Input:: *)
-(*AssociateTo[crunchgrub,rmin-> Input["Please enter your guess of rmin ('r')"](* 7*)];*)
-
-
-(* ::Subsection:: *)
-(*Determining chosendeg*)
-
-
-(* ::Item:: *)
-(*For "n" ranging from cdegmin\[LongRightArrow] cdegmax,  *)
-
-
-(* ::Subitem:: *)
-(*Find the "r" (rmin) estimated eigenvalues using Algorithm 6.1*)
-
-
-(* ::Subsubitem:: *)
-(*True eigenvalues known : Find the Hausdorff distance of the estimated lot to the truth*)
-
-
-(* ::Subsubitem:: *)
-(*If not, compute the pair-wise Hausdorff distances over the range of "n" under purview*)
+(*Determining rmin*)
 
 
 (* ::Subsubsection:: *)
-(*Subscript[Subscript[Log, 10][Subscript[\[Rho], Hausdorff](\!\(\*OverscriptBox[*)
-(*SubscriptBox[\(\[Nu]\), \(r + i\)], \(^\)]\),\!\(\*OverscriptBox[*)
-(*SubscriptBox[\(\[Nu]\), \(r + j\)], \(^\)]\))], i,j>= 1] : Pair-wise Hausdorff distances when true eigenvalues are unknown*)
+(*Log10[How well is the y-th estimate contained in the x-th estimate] *)
 
 
 (* ::Input:: *)
-(*getetvdepwrtcdeg[vals,crunchgrub,crunchgrub[rmin]+1 (* 0 would squish the variations with increasing "n"*),crunchgrub[maxn]]*)
+(*getetvdepwrtcdeg[vals,crunchgrub]*)
 
 
 (* ::Subsection:: *)
-(*Choose chosendeg  and rmin from the earlier diagnostics*)
+(*Choose  rmin from the earlier diagnostics*)
 
 
 (* ::Item:: *)
-(*chosendeg: There is no set method to choosing this. Following are some suggestions*)
-
-
-(* ::Subitem:: *)
-(*Smallest x-coordinate with low spread in \delta_{rel}^{\mu}*)
-
-
-(* ::Subitem:: *)
-(*Easy when you know the true eigenvalues : Pick a point in the first plot that has a low y-coordinate*)
-
-
-(* ::Subitem:: *)
-(*When eigenvalues are unknown (as in the cavity flow), look for a value of 'n' in the second plot that*)
-
-
-(* ::Subsubitem:: *)
-(*Has a small value  in the (1,n)th cell*)
-
-
-(* ::Subsubitem:: *)
-(*Is small for (n,n+1), (n,n+2), (n,n+3).... for as long as possible (i.e.  choosing more estimates of the eigenvalues doesn't change the n-th estimate greatly)*)
-
-
-(* ::Item:: *)
-(*rmin : Update if needed*)
+(*Highest y-coordinate, within \hat{r}_{min}: \hat{r}_{max}, with a row of low values*)
 
 
 (* ::Input:: *)
-(*AssociateTo[crunchgrub,{chosendeg->Input["Please enter your guess of chosendeg ('n' in Algo 6.1)"](*17*),rmin-> Input["Please update your guess of rmin ('r')"](*7*)}];*)
-(*{prunedrootqfs,estruevals}=sneakyestimatetruevals[vals,crunchgrub,"verbose"];*)
+(*AssociateTo[crunchgrub,{rmin-> Input["Please enter your guess of rmin ('hat{r}')"](* 7*),chosendeg->  Input["Please enter hat{n} to sample hat{r} from "]}];*)
+
+
+(* ::Subsubsection::Closed:: *)
+(*Pick data with sufficient delays and extract their common eigenvalues*)
+
+
+(* ::Input:: *)
+(*AssociateTo[crunchgrub,{delaymin-> crunchgrub[chosendeg]-1}];*)
+(*valswithgoodelays=keepthemgoodelays[onlythequads[vals],crunchgrub];*)
+
+
+(* ::Input:: *)
+(*{prunedrootqfs,estruevals}=sneakyestimatetruevals[valswithgoodelays,crunchgrub,"verbose"];*)
+(*Clear[valswithgoodelays];*)
 
 
 (* ::Subsubsection::Closed:: *)
@@ -601,25 +532,16 @@
 (*crunchcoords = Flatten[Outer[{##}&,crunchgrub[testdelays],crunchgrub[testdegs]],1];*)
 
 
-(* ::Input:: *)
-(*vals2plotopsVScases[vals_,crunchcoords_,ncases_]:=Module[{casewiserates,opsVScases,funnyopsVScases,plotopsVScases},*)
-(*casewiserates = (* Case, IC,del,deg*)Table[ Map[(#[ratequads])[[All,All,i]]&,vals],{i,ncases}];opsVScases = Table[casewiserates[[j,All,All,All,i]],{i,3}(* PDF, rperror, respercent *),{j,ncases}(* Vanilla, MS, MS + Pres, MS + Delay *)];*)
-(*funnyopsVScases = Map[makecratesfunny[Mean,#&,#]&,Rest[opsVScases],{2}];*)
-(*plotopsVScases = Map[ldplot[crunchcoords,splog10@#]&,funnyopsVScases ,{2}];*)
-(*MatrixForm[plotopsVScases\[Transpose]]*)
-(*]*)
-
-
 (* ::Section:: *)
 (*Theorem checks*)
 
 
 (* ::Item:: *)
-(*Each case generates a 4 x 4 table of heat-maps, each plot describing the variation of an averaged quantity with respect to #[delays] and n*)
+(*Each case generates a 4 x 2 table of heat-maps, each plot describing the variation of an averaged quantity with respect to #[delays] and n*)
 
 
 (* ::Subitem:: *)
-(*Columns : Subscript[\[Rho], Subset], Subscript[\[Delta], Trivial]*)
+(*Columns : \[Rho]_{Subset}, \[Delta]_{Trivial}*)
 
 
 (* ::Subitem:: *)
@@ -640,6 +562,41 @@
 
 (* ::Input:: *)
 (*liftgrub[truevals] = estruevals;*)
-(**)
 (*vals =ParallelMap[ms1shot4trajvariations[trajgrub,liftgrub,priorsgrub,testpriorsgrub,crunchgrub,#]&,{listoICs,listotseries,oldvals}\[Transpose]];*)
+
+
+(* ::Input:: *)
 (*vals2plotopsVScases[vals,crunchcoords,ncases]*)
+
+
+(* ::Subsubsection:: *)
+(*Save again*)
+
+
+(* ::Input:: *)
+(*DumpSave[crunchgrub[savefile],{oldvals,vals,crunchgrub,trajgrub,liftgrub,priorsgrub,testpriorsgrub,basicolourlist,listoICs,plotgrub,simsteps,crunchcoords,ncases}];*)
+
+
+(* ::PageBreak:: *)
+(**)
+
+
+(* ::Chapter::Closed:: *)
+(*Restore-point #2*)
+
+
+(* ::Text:: *)
+(*Complete save-point*)
+
+
+(* ::Input:: *)
+(*(*Get[crunchgrub[savefile]];*)
+(*(* Load the velocityfield data *)*)
+(*Get[trajgrub[prunedata]];*)
+(*(* Generate your trajectories *)*)
+(*listotseries = Map[((velocityfield[cavityPsi])[[All,Range[0,simsteps]+#]])\[Transpose](* Trasnpose coz the cavityPsi is in snapshot form *)&,listoICs];*)*)
+
+
+(* ::Input:: *)
+(*(*ldplot[deldegcoords_,zcoords_]:=ldplot[deldegcoords,zcoords,{"n","#[delays]"},{-16,1},"TemperatureMap"];*)*)
+(*(*vals2plotopsVScases[vals,crunchcoords,ncases]*)*)

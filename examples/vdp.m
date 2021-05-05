@@ -1,11 +1,11 @@
 (* ::Package:: *)
 
-(* ::Chapter:: *)
+(* ::Chapter::Closed:: *)
 (*Initialization*)
 
 
 (* ::Subsubsection::Closed:: *)
-(* Use the makefile to load necessary functions *)
+(*Run scripts containing functions*)
 
 
 (* ::Input:: *)
@@ -28,16 +28,8 @@
 (*AssociateTo[crunchgrub,savefile ->FileBaseName[NotebookFileName[]](* Name savefile after notebook *) ];*)
 
 
-(* ::Chapter:: *)
+(* ::Chapter::Closed:: *)
 (*Computation*)
-
-
-(* ::Subchapter:: *)
-(*First run *)
-
-
-(* ::Text:: *)
-(*No pre-existing save files*)
 
 
 (* ::Section:: *)
@@ -80,32 +72,24 @@
 (*LTI*)
 
 
-(* ::Subitem:: *)
+(* ::Text:: *)
 (*discevals: Discrete time eigenvalues of the LTI system *)
 
 
 (* ::Subitem:: *)
-(*Subscript[LTI, 1]: Exp[I*(2\[Pi])/7*Range[0,6]]*)
+(*LTI_{1}: Exp[I*2\[Pi]/7*Range[0,6]]*)
 
 
 (* ::Subsubitem:: *)
-(*Subscript[LTI, 1.5] : Exp[I*(2\[Pi])/7*Range[0,6]]*Exp[I*(2\[Pi])/14] *)
+(*LTI_{1.5} : Exp[I*2\[Pi]/7*Range[0,6]]*Exp[I*2\[Pi]/14] *)
 
 
 (* ::Subitem:: *)
-(*Subscript[LTI, 2]: RandomReal[{0.8,1.2},7]*Exp[I*RandomReal[{-\[Pi],\[Pi]},7]]*)
+(*LTI_{2}: RandomReal[{0.8,1.2},7]*Exp[I*RandomReal[{-\[Pi],\[Pi]},7]]*)
 
 
 (* ::Item:: *)
-(*VDP*: Subscript[\!\(\*OverscriptBox[\(x\), \(.\)]\), 1]=Subscript[x, 2], Subscript[\!\(\*OverscriptBox[\(x\), \(.\)]\), 2] = \[Epsilon](1-Subscript[x, 1]^2)Subscript[x, 2]-Subscript[x, 1]*)
-
-
-(* ::Subitem:: *)
-(*The vector-field is mollified with a Gaussian of large enough width to leave the limit cycle dynamics unaltered*)
-
-
-(* ::Subsubitem:: *)
-(*This feature is not very relevant to  this study*)
+(*VDP : x1'=x2,x2'=\epsilon(1-x1^2)x2-x1 .*)
 
 
 (* ::Input:: *)
@@ -134,11 +118,11 @@
 
 
 (* ::Item:: *)
-(*crank: Rank of \!\(\*OverscriptBox[\(C\), \(~\)]\)*)
+(*crank: Rank of \tilde{C}*)
 
 
 (* ::Item:: *)
-(*crows: #(Rows) of \!\(\*OverscriptBox[\(C\), \(~\)]\) = "m"*)
+(*crows: #(Rows) of  \tilde{C} = "m"*)
 
 
 (* ::Item:: *)
@@ -146,8 +130,7 @@
 
 
 (* ::Subitem:: *)
-(*nprojs = ssdim \[DoubleLongRightArrow] C and \!\(\*OverscriptBox[\(C\), *)
-(*OverscriptBox[\(~\), \(\ \)]]\) have the same number of columns ("r")*)
+(*nprojs = ssdim \[DoubleLongRightArrow] C and \tilde{C} have the same number of columns ("r")*)
 
 
 (* ::Subitem:: *)
@@ -211,7 +194,7 @@
 
 
 (* ::Item:: *)
-(*nfunda : Parameters used to decide when Case 1 can occur, and accordingly change the reference for Subscript[\[Rho], Subset] and Subscript[\[Delta], Trivial] using  getevalpartitions (See Table 6.1)*)
+(*nfunda : Parameters used to decide when Case 1 can occur, and accordingly change the reference for \[Rho]_{Subset} and \[Delta]_{Trivial} using  getevalpartitions (See Table 6.1)*)
 
 
 (* ::Subitem:: *)
@@ -331,33 +314,12 @@
 (*Flavours  (Redundant)*)
 
 
-
 (* ::Input:: *)
-(*(* AppendTo[userlist,(*Desired fheads*)];*)*)
-(**)
 (*AssociateTo[priorsgrub,userparams ->  {}];*)
 
 
-
-(* ::Item:: *)
-(*Should be a LIST of matrices !!!*)
-
-
 (* ::Input:: *)
-(*AssociateTo[priorsgrub,{(*(*  *)*)
-(*invsamplesets \[Rule] {},*)
-(*(*  *)*)
-(*ipfuns(**)\[Rule] {},*)
-(*opfuns(**)\[Rule] {},*)*)
-(*rawuserlist ->  {}}];*)
-
-
-
-(* ::Input:: *)
-(*(*AssociateTo[testpriorsgrub,{*)
-(*testinvsamplesets \[Rule] {},*)
-(*testipfuns \[Rule] {},*)
-(*testopfuns \[Rule] {}}];*)*)
+(*AssociateTo[priorsgrub,{rawuserlist ->  {}}];*)
 
 
 (* ::Input:: *)
@@ -437,11 +399,7 @@
 
 
 (* ::Section:: *)
-(*First computing run*)
-
-
-(* ::Subsection::Closed:: *)
-(*Initial analysis without truevals*)
+(*Analyse each trajectory, for all possible hyper-parameters.*)
 
 
 (* ::Input:: *)
@@ -454,12 +412,16 @@
 (*Print[AbsoluteTime[]];*)
 
 
+(* ::Subsubsection:: *)
+(*Save progress*)
+
+
 (* ::Input:: *)
 (*DumpSave[crunchgrub[savefile],{vals,crunchgrub,trajgrub,liftgrub,priorsgrub,testpriorsgrub,basicolourlist,listoICs,listotseries,plotgrub}];*)
 
 
-(* ::Subchapter:: *)
-(*Later runs (i.e a savefile exists)*)
+(* ::Chapter::Closed:: *)
+(*Restore-point #1*)
 
 
 (* ::Input:: *)
@@ -471,7 +433,7 @@
 
 
 (* ::Section:: *)
-(*Subscript[c, ms] transition*)
+(*DMD-DFT transition*)
 
 
 (* ::Subsubsection::Closed:: *)
@@ -479,7 +441,7 @@
 
 
 (* ::Text:: *)
-(*Compute \!\(\*SubsuperscriptBox[\(\[Delta]\), \(rel\), \(\[Mu]\)]\)*)
+(*Compute \delta_{rel}^{\mu}*)
 
 
 (* ::Input:: *)
@@ -487,7 +449,7 @@
 
 
 (* ::Text:: *)
-(*Collect \[Kappa](X),Subscript[\[Sigma], tail](X)*)
+(*Collect \[Kappa](X),\sigma_{tail}(X)*)
 
 
 (* ::Input:: *)
@@ -504,38 +466,34 @@
 
 
 (* ::Input:: *)
-(*BarLegend[{basicolourlist,Through[{Min,Max}[crunchgrub[testdelays]]]},crunchgrub[testdelays],LegendLabel->"#[delays]"]*)
-
-
-(* ::Text:: *)
-(*Locate position of "r" within degrees("n") being tested*)
-
-
-(* ::Input:: *)
-(*findnprojsintestdegs = (Flatten[Position[crunchgrub[testdegs],liftgrub[nprojs]]])[[1]];*)
-
-
-(* ::Item:: *)
-(*Delays reduce the jump gap from 10^15\[LongRightArrow]10^5 : LTI 1, LTI 2, LTI 3*)
+(*delayscolored=BarLegend[{basicolourlist,Through[{Min,Max}[crunchgrub[testdelays]]]},crunchgrub[testdelays],LegendLabel->"#[delays]"];*)
 
 
 (* ::Input:: *)
 (*tplots=MapThread[BoxWhiskerChart[splog10[#1],ChartStyle->#2,ChartLabels-> crunchgrub[testdegs],ImageSize->Large,PlotRange->All,LabelStyle->Directive[Black, Medium]]&,{ensembledat,basicolourlist}];*)
-(*(*Manipulate[tplots[[i]],{i,1,25,1}]*)*)
+
+
+(* ::Input:: *)
+(*(*lengthoftplots=Length@tplots;*)
+(*Manipulate[tplots[[i]],{i,1,lengthoftplots,1}]*)*)
 
 
 (* ::Subsection:: *)
-(* \!\(\*SubsuperscriptBox[\(\[Delta]\), \(rel\), \(\[Mu]\)]\) Vs n*)
+(* Deviation of mean-subtracted DMD from DFT Vs Order of DMD model (n)*)
+
+
+(* ::Item:: *)
+(*Find \hat{r}_{min}, \hat{r}_{max} so that when at least n_{max}-1 delays are taken,  the jump in the indicator  occurs for  \hat{r}_{min} <=  n <= \hat{r}_{max}*)
 
 
 (* ::Input:: *)
 (*transitplot=(Show[##,PlotRange-> All]&)@@(tplots);*)
-(*Show[transitplot,FrameLabel->{{HoldForm[Subscript[Log, 10][\!\(\*SubsuperscriptBox[\(\[Delta]\), \(rel\), \(\[Mu]\)]\)]],None},{HoldForm[n],None}},PlotLabel->None,LabelStyle->{Directive[Black, Medium]}]*)
+(*(*Put the correct legend *)(Legended[#,delayscolored]&)@(*On this bunch of plots that have been overlaid *)Show[transitplot,FrameLabel->{{HoldForm[Subscript[Log, 10][\!\(\*SubsuperscriptBox[\(\[Delta]\), \(rel\), \(\[Mu]\)]\)]],None},{HoldForm[n],None}},PlotLabel->None,LabelStyle->{Directive[Black, Medium]}]*)
 
 
 (* ::Subsubsection:: *)
-(*Subscript[\[Sigma], Tail] Vs n*)
+(*Tail of SVD lost in truncation Vs Order of DMD model (n)*)
 
 
 (* ::Input:: *)
-(*(Show[##,PlotRange-> All]&)@@(MapThread[BoxWhiskerChart[splog10[#1],ChartStyle->#2,ChartLabels-> crunchgrub[testdegs],ImageSize->Large,PlotRange->All,LabelStyle->Directive[Black, Medium]]&,{ensemblechoppeddat,basicolourlist}])*)
+(*(Legended[#,delayscolored]&)@((Show[##,PlotRange-> All]&)@@(MapThread[BoxWhiskerChart[splog10[#1],ChartStyle->#2,ChartLabels-> crunchgrub[testdegs],ImageSize->Large,PlotRange->All,LabelStyle->Directive[Black, Medium]]&,{ensemblechoppeddat,basicolourlist}]))*)
