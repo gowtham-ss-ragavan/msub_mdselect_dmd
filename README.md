@@ -14,11 +14,17 @@
 ### Analysis
 
 - Any of the notebooks can be run directly. 
-- Tunable parameters are contained in the section **First run**, within subsections that are open by default
+- Tunable parameters are contained in **Computations**/**Temporal parameters**, within subsections that are open by default
 - During run-time, you will be prompted to enter additional parameters for *Algorithm 6.1* as more data becomes available.
   - Guidelines precede corresponding code segments.
-- Notebooks are configured to save the output
-  - Savefile can be used by commenting out the section **First run** and using **Later runs** 	
+- Notebooks are configured to save the output, and hence restart the analysis, at two distinct stages
+  - **Restore-point #1**: After DMD over the chosen set of delays, model orders and trajectories, but before any further post-processing
+  - **Restore-point #2**: At the end of all intended analysis
+- By default, the code saves output at both stages so that one can step back to either of those points
+- Restore procedure: Run **Initialization**, then **Restore-point** of choice, and proceed as usual. 
+
+
+
 
 
 
