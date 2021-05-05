@@ -256,7 +256,7 @@ TrueQ[Min[cores] > Max[noncores]]
 ];
 
 
-(* ::Subsubsection::Closed:: *)
+(* ::Subsubsection:: *)
 (*Numerical checks for mode-selection theorems*)
 
 
@@ -276,8 +276,8 @@ respercent = If[Length[structevals]>n,
 (* #[Constraints] > #[DMD order] \[Equal]> Cannot construct a PDF *)1,
 (* Else, strcutedc will have just the right dimensions to hit xmat from the right*)structevecs = getCompanionEvecs[structevals];
 structedpdf = cmodesvals2pdf[structedc ,(xmat.(structevecs\[Transpose]))\[Transpose],structevals];
-If[(* If the minimum contribution of corevals exceeds the maximium contribution of the others,*)non0coresQ[structedpdf[[2]],ncorevals],
-(* Find the unexplained percentage: Subscript[\[Delta], trivial ]*) 1-  Total[Take[structedpdf[[2]],ncorevals]],(* Straight F*)1]
+(*---------- Compute the unexplained fraction --------------------------------*)
+1 -  Total[Take[structedpdf[[2]],ncorevals]]
 ];
 {rperror,respercent}
 ];
