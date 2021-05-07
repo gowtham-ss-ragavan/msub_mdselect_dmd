@@ -449,7 +449,7 @@ qforms = Map[(* Technically always non-ngeative...but we have some pesky small i
 
 
 (* ::Item:: *)
-(*Steps 6-8 in Algorithm 6.1*)
+(*~ Steps 3-5 in Algorithm 6.1*)
 
 
 aw2sneakyropts[aw_,restols_,sigtols_]:=Module[{dmat,localn,usv,cte,numericu2,umat,u2,pdf,roots,probs,qforms},
@@ -483,7 +483,7 @@ rqfpairs[[orderpls]]
 
 
 (* ::Item:: *)
-(*Implements Steps 5-9 of Algorithm 6.1*)
+(*Implements  Algorithm 6.1*)
 
 
 (* ::Subitem:: *)
