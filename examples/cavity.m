@@ -40,7 +40,7 @@
 (*AssociateTo[crunchgrub, savefile -> StringJoin[{FileBaseName[NotebookFileName[]] , "_vals_", trajgrub[vfield]}]];*)
 
 
-(* ::Chapter:: *)
+(* ::Chapter::Closed:: *)
 (*Computations*)
 
 
@@ -581,7 +581,7 @@
 (**)
 
 
-(* ::Chapter::Closed:: *)
+(* ::Chapter:: *)
 (*Restore-point #2*)
 
 
@@ -595,8 +595,3 @@
 (*Get[trajgrub[prunedata]];*)
 (*(* Generate your trajectories *)*)
 (*listotseries = Map[((velocityfield[cavityPsi])[[All,Range[0,simsteps]+#]])\[Transpose](* Trasnpose coz the cavityPsi is in snapshot form *)&,listoICs];*)*)
-
-
-(* ::Input:: *)
-(*(*ldplot[deldegcoords_,zcoords_]:=ldplot[deldegcoords,zcoords,{"n","#[delays]"},{-16,1},"TemperatureMap"];*)*)
-(*(*vals2plotopsVScases[vals,crunchcoords,ncases]*)*)
