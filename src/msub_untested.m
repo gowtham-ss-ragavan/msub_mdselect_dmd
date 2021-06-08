@@ -324,7 +324,7 @@ ListDensityPlot[ldpin,InterpolationOrder->0,PlotLegends->Automatic,FrameLabel->f
 (*Specifically for the heat maps*)
 
 
-ldplot[deldegcoords_,zcoords_]:=ldplot[deldegcoords,zcoords,{"n","#[delays]"},All,Automatic];
+ldplot[deldegcoords_,zcoords_]:=ldplot[deldegcoords,zcoords,{"n","#[delays]"},All,"TemperatureMap"];
 
 
 (* ::Subsubsection:: *)
@@ -355,9 +355,12 @@ getclusterplot[zmat_, zmatindices_, nclusters_] := Module[{zmatclusters, cluster
 (*Generate heat-maps of numerical checks from vals*)
 
 
-vals2plotopsVScases[vals_,crunchcoords_,ncases_]:=Module[{casewiserates,opsVScases,funnyopsVScases,plotopsVScases},
+vals2plotopsVScases[vals_,crunchcoords_,ncases_,fun_]:=Module[{casewiserates,opsVScases,funnyopsVScases,plotopsVScases},
 casewiserates = (* Case, IC,del,deg*)Table[ Map[(#[ratequads])[[All,All,i]]&,vals],{i,ncases}];opsVScases = Table[casewiserates[[j,All,All,All,i]],{i,3}(* PDF, rperror, respercent *),{j,ncases}(* Vanilla, MS, MS + Pres, MS + Delay *)];
-funnyopsVScases = Map[makecratesfunny[Mean,#&,#]&,Rest[opsVScases],{2}];
+funnyopsVScases = Map[makecratesfunny[fun,#&,#]&,Rest[opsVScases],{2}];
 plotopsVScases = Map[ldplot[crunchcoords,splog10@#]&,funnyopsVScases ,{2}];
 MatrixForm[plotopsVScases\[Transpose]]
 ]
+
+
+vals2plotopsVScases[vals_,crunchcoords_,ncases_]:= vals2plotopsVScases[vals,crunchcoords,ncases,Quantile[#,95/100]&]
