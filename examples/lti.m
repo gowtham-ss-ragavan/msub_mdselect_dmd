@@ -32,7 +32,7 @@
 (*Computation*)
 
 
-(* ::Section:: *)
+(* ::Section::Closed:: *)
 (*Temporal parameters*)
 
 
@@ -94,7 +94,7 @@
 
 (* ::Input:: *)
 (**)
-(*AssociateTo[trajgrub, discevals ->RandomReal[{0.8,1.2},7]*Exp[I*RandomReal[{-\[Pi],\[Pi]},7]]  (*Exp[\[ImaginaryI]*(2\[Pi])/7*Range[0,6]]*Exp[\[ImaginaryI]*(2\[Pi])/14] *)]; *)
+(*AssociateTo[trajgrub, discevals ->(*RandomReal[{0.8,1.2},7]*Exp[\[ImaginaryI]*RandomReal[{-\[Pi],\[Pi]},7]]  *)Exp[I*(2\[Pi])/7*Range[0,6]](**Exp[\[ImaginaryI]*(2\[Pi])/14] *)]; *)
 (**)
 
 
@@ -135,7 +135,7 @@
 
 
 (* ::Input:: *)
-(*AssociateTo[liftgrub,{cmatseed-> {},crank ->ssdim (*1*), crows -> 2*ssdim (**)  , nprojs -> ssdim (* \[LessEqual] ssdim ...tis simply the number of non-zero entires in the IC*)}];*)
+(*AssociateTo[liftgrub,{cmatseed-> {},crank ->(*ssdim *)1, crows -> 2*ssdim (**)  , nprojs -> ssdim (* \[LessEqual] ssdim ...tis simply the number of non-zero entires in the IC*)}];*)
 (**)
 
 
@@ -232,7 +232,7 @@
 
 
 (* ::Input:: *)
-(*AssociateTo[liftgrub,{rate2sub -> 1,nfunda-> (* Case 2 always *) 2*trajgrub[maxn] (* Impute the number you've rigged the system to have *)(*6*)(* 13*)}];*)
+(*AssociateTo[liftgrub,{rate2sub -> 1,nfunda-> (* Case 2 always *)(* 2*trajgrub[maxn] *)(* Impute the number you've rigged the system to have *)6(* 13*)}];*)
 (*AssociateTo[liftgrub,truevals-> trajgrub[discevals](* {} if you don't know what it should be, in which case we don't know what mean subtraction does *)]; *)
 
 
@@ -372,7 +372,7 @@
 
 
 (* ::Input:: *)
-(*nICs =20;*)
+(*nICs =50;*)
 
 
 (* ::Subsubsection::Closed:: *)
@@ -613,6 +613,9 @@
 (*liftgrub[truevals] = estruevals;*)
 (**)
 (*vals =ParallelMap[ms1shot4trajvariations[trajgrub,liftgrub,priorsgrub,testpriorsgrub,crunchgrub,#]&,{listoICs,listotseries,oldvals}\[Transpose]];*)
+
+
+(* ::Input:: *)
 (*vals2plotopsVScases[vals,crunchcoords,ncases]*)
 
 
@@ -624,10 +627,13 @@
 (*liftgrub[truevals] = N@trajgrub[discevals];*)
 (**)
 (*valshonest =ParallelMap[ms1shot4trajvariations[trajgrub,liftgrub,priorsgrub,testpriorsgrub,crunchgrub,#]&,{listoICs,listotseries,oldvals}\[Transpose]];*)
+
+
+(* ::Input:: *)
 (*vals2plotopsVScases[valshonest,crunchcoords,ncases]*)
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*Save again*)
 
 
@@ -648,13 +654,4 @@
 
 
 (* ::Input:: *)
-(*(*Get[crunchgrub[savefile]];*)
-(*(* Load the velocityfield data *)*)
-(*Get[trajgrub[prunedata]];*)
-(*(* Generate your trajectories *)*)
-(*listotseries = Map[((velocityfield[cavityPsi])[[All,Range[0,simsteps]+#]])\[Transpose](* Trasnpose coz the cavityPsi is in snapshot form *)&,listoICs];*)*)
-
-
-(* ::Input:: *)
-(*(*ldplot[deldegcoords_,zcoords_]:=ldplot[deldegcoords,zcoords,{"n","#[delays]"},{-16,1},"TemperatureMap"];*)*)
-(*(*vals2plotopsVScases[vals,crunchcoords,ncases]*)*)
+(*(*Get[crunchgrub[savefile]];*)*)
