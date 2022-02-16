@@ -9,6 +9,7 @@
 
 
 tseries2bigdatamat[tseries_,ndelays_]:=Map[Flatten,Partition[tseries,ndelays+2,1]]\[Transpose];
+(* You should have ndelays + 1: An additional 1 is required to compensate for the loss in getXtendedmats, via liftedY *)
 
 
 (* ::Subsubsection::Closed:: *)

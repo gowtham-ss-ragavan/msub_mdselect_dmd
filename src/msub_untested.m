@@ -10,7 +10,7 @@
 
 getCompanionEvecs[vals_,clen_]:=Module[{vecs,scales},
 vecs = Table[roots2coeffs[Drop[vals,{i}]],{i,clen}];
-scales = MapThread[(getgpvec[#1,clen-1].#2)&,{vals,vecs}];
+scales = MapThread[(getgpvec[#1,clen-1] . #2)&,{vals,vecs}];
 (scales^(-1))*vecs
 ];
 
@@ -108,7 +108,7 @@ index = 1;
 (*params[[-1]]: \tilde{C} ~ Coefficients of the dictionary in terms of the eigenfunctions of the underlying Koopman invariant SS*)
 
 
-basislift[mat_,params_,flavour_]:=params[[-1]].(naivebasislift[mat,Most[params],flavour]);
+basislift[mat_,params_,flavour_]:=params[[-1]] . (naivebasislift[mat,Most[params],flavour]);
 
 
 (* ::Subsubsection::Closed:: *)
@@ -145,7 +145,7 @@ getparamsplus[dummyvars_,obsdim_,liftgrub_]:=getparamsplus[dummyvars,liftgrub[fl
 (*meansuboneshot*)
 
 
-(* ::Subsubsection::Closed:: *)
+(* ::Subsubsection:: *)
 (*No structing*)
 
 
@@ -165,6 +165,7 @@ userlist = rawuserlist;
 (* Create the ICs*)
 tseries =rawics ;
 (* Convert the time series into data matrices that can be used by getXtended *)
+(* #[delays] effected is ndelays +1, so that it compensates for the loss of 1 in getXtended *)
 datamat =tseries2bigdatamat[tseries,ndelays];
 (* Parameters that we'll need later on*)
 obsdim = Length[rawics[[1]]]; 
@@ -188,16 +189,16 @@ m2 = m15*(ndelays+1);
 commoninvgrub = {ndelays,dummyvars,params,flavour,userparams,userhead,construct,basistruct,m1,m2,obsdim,m15};
 giveninvgrub = {invsamplesets,ipfuns,opfuns};
 {liftedX,liftedY} =getXtendedmats[datamat,params,flavour,userparams,userhead,obsdim];
+(* liftedY is of no use whatsover for this study since it simply uses Companion DMD*)
 (*----------------------------------------*)
 (* Compute c-r-e quads over the desired set of delays, trajectory length / system order *)
 matcarvefun = (liftedX[[Range[m1 + (* The new face..NOT m15*)crows*(1+#1)],Range[(*(* Will do a delay, and so need atleast 3..and hence the 2*)2*)  (* testdegs are better written as testns... and so we need only take one additional column *)1+#2]]])&;
 If[ipgrub==<||>(* Length[ipgrub] \[Equal] 0 *),
+(*------------- First computational pass : No priors ----------------*)
 crefun =getcquad[matcarvefun[#1,#2],rate2sub,sigtols,restols,truevals,nfunda,crows,#1]&;
 crequads=Transpose[Outer[crefun,testdelays,testdegs],{2,3,1,4}];
-(*----------------------------------------*)
-(*-----------Might wanna include more relevant things with the OP------------------*)
-(*----------------------------------------*)
 opgrub=<|cquads-> crequads[[1]],ratequads-> crequads[[2]],equads-> crequads[[3]],mexparams->  {params,flavour,userparams,userhead,obsdim},i2bdmparams-> {vfield,tinit,tfinn,sampackage,chosenputty} |>,
+(*------------- Updating numerical checks with new eigenvalue estimates ----------------*)
 opgrub = ipgrub;
 crefun =(* Compute rperror and respercent with truevals whiich is likely a product of estimatruevals*) updatednumchks[matcarvefun@@#1,rate2sub,truevals,restols,sigtols,nfunda,#2]&;
 deldegmat = Outer[{##}&,testdelays,testdegs];
