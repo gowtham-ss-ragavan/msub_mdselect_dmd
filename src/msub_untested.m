@@ -183,11 +183,6 @@ userhead = Through[userlist[##]]&;
 m1 = Length@userlist; (* Number of user specified functions *) 
 m2 = m15*(ndelays+1);
 (* Number of basis functions taken : May need to evaluate basislift to get this*)
-(*-----------------------------*)
-(*-----GENERATE CONSTRAINT MATRICES-----*)
-(*-----------------------------*)
-commoninvgrub = {ndelays,dummyvars,params,flavour,userparams,userhead,construct,basistruct,m1,m2,obsdim,m15};
-giveninvgrub = {invsamplesets,ipfuns,opfuns};
 {liftedX,liftedY} =getXtendedmats[datamat,params,flavour,userparams,userhead,obsdim];
 (* liftedY is of no use whatsover for this study since it simply uses Companion DMD*)
 (*----------------------------------------*)
@@ -197,7 +192,7 @@ If[ipgrub==<||>(* Length[ipgrub] \[Equal] 0 *),
 (*------------- First computational pass : No priors ----------------*)
 crefun =getcquad[matcarvefun[#1,#2],rate2sub,sigtols,restols,truevals,nfunda,crows,#1]&;
 crequads=Transpose[Outer[crefun,testdelays,testdegs],{2,3,1,4}];
-opgrub=<|cquads-> crequads[[1]],ratequads-> crequads[[2]],equads-> crequads[[3]],mexparams->  {params,flavour,userparams,userhead,obsdim},i2bdmparams-> {vfield,tinit,tfinn,sampackage,chosenputty} |>,
+opgrub=<|cquads-> crequads[[1]],ratequads-> crequads[[2]],equads-> crequads[[3]] |>,
 (*------------- Updating numerical checks with new eigenvalue estimates ----------------*)
 opgrub = ipgrub;
 crefun =(* Compute rperror and respercent with truevals whiich is likely a product of estimatruevals*) updatednumchks[matcarvefun@@#1,rate2sub,truevals,restols,sigtols,nfunda,#2]&;
