@@ -1,0 +1,97 @@
+(*
+ Wolfram Language scrapbook file.
+
+ The contents can be evaluated by selecting the 
+ file, right-clicking, and choosing Wolfram/Run
+ or Wolfram/Debug.
+*)
+
+
+
+
+
+
+meansuboneshot[ndelays_ ,tinit_,vfield_,rawics_,chosenputty_,sigtols_,restols_,flavour_,flavourparams_,construct_,basistruct_,userparams_,rawuserlist_,invsamplesets_,ipfuns_,opfuns_,testinvsamplesets_,testipfuns_,testopfuns_,boxflavourparams_,cmatseed_,crows_,crank_,testdelays_,testdegs_,rate2sub_,nfunda_,truevals_,ipgrub_]:= 
+Module[{obsdim,datamat,tseries,cmat,opgrub,crequads,crefun,matcarvefun,deldegmat,newchks,newrqs},
+(*-----------------------------*)
+(*------PRELIMINARIES-------*)
+(*-----------------------------*)
+
+(* Parameters that we'll need later on*)
+(* obsdim = r in the manuscript *)
+obsdim = Length[rawics[[1]]]; 
+
+
+(* cmat ~ m x r = crows x obsdim *)
+
+cmat = If[cmatseed == {}(* If unspecified, create using getrandmat *), 
+	usvdot@((* randmat's OP is in usv form*)getrandmat[crows,obsdim,{crank,{}}]),
+	cmatseed (* Use given Cmatrix*)];
+
+
+
+(* Create the ICs*)
+tseries = rawics.Transpose[cmat] ;
+
+(* Create noise matrix here *)
+(* Same dimensions as tseries *)
+(* IID along the rows *)
+
+(* Would ideally give the dimensions required, and the direction of IID ness *)
+(* And out pops the noise matrix*)
+
+
+
+(* The maximally delayed Z matrix *)
+datamat = tseries2bigdatamat[tseries,ndelays-1];
+
+
+
+
+
+(* Compute c-r-e quads over the desired set of delays, trajectory length / system order *)
+matcarvefun = (
+datamat[[
+	Range[crows*(1+#1)],
+	Range[(* testdegs are better written as testns... and so we need only take one additional column *)
+		1+#2]
+		]]
+		)&;
+
+
+
+
+
+
+
+
+If[ipgrub==<||>,
+(*------------- First computational pass : No priors ----------------*)
+
+crefun =getcquad[matcarvefun[#1,#2],rate2sub,sigtols,restols,truevals,nfunda,crows,#1]&;
+crequads=Transpose[Outer[crefun,testdelays,testdegs],{2,3,1,4}];
+opgrub=<|cquads-> crequads[[1]],ratequads-> crequads[[2]],equads-> crequads[[3]] |>,
+
+
+
+
+
+(*------------- Updating numerical checks with new eigenvalue estimates ----------------*)
+
+opgrub = ipgrub;
+(* Compute rperror and respercent with truevals whiich is likely a product of estimatruevals*) 
+crefun = updatednumchks[matcarvefun@@#1,rate2sub,truevals,restols,sigtols,nfunda,#2]&;
+deldegmat = Outer[{##}&,testdelays,testdegs];
+newchks = MapThread[crefun,{deldegmat,ipgrub[cquads]},2];
+(*Update opgrub with newchks appropriately *)
+newrqs = opgrub[ratequads];
+newrqs[[(* Delays *)All,(* Degrees *)All,(* Cases *)All,{2,3}]]=newchks;
+opgrub[ratequads]=newrqs
+];
+
+
+
+
+
+opgrub
+];
