@@ -6,13 +6,178 @@
  or Wolfram/Debug.
 *)
 
+(* 
+coreIIDgen: m,n basicdist ----> m x n matrix of IID noise 
+- The direction of IIDness can be anything you choose
+*)
+
+coreIIDgen[{m_,n_}, basicdist_]:= Module[{abstractdist, allsamps},
+	abstractdist = WhiteNoiseProcess[basicdist];
+	allsamps = RandomFunction[abstractdist, {1,m*n}];
+	Partition[allsamps["Values"], n]
+];
+
+
+(*
+
+getIIDnoise: {m,n}, basicdist, covmat ---> m \times n matrix, IID along n
+
+---> basicdist must have zero mean, and unit variance. (Latter to ensure you get the correct covariance matrix, upon using the transform)
+
+
+
+*)
+
+
+getIIDnoise[dims_, basicdist_,covmat_]:=Module[{transform},
+	transform = ConjugateTranpose@CholeskyDecomposition[covmat];
+	transform.coreIIDgen[dims,basicdist]
+];
 
 
 
 
+(* 
 
-meansuboneshot[ndelays_ ,tinit_,vfield_,rawics_,chosenputty_,sigtols_,restols_,flavour_,flavourparams_,construct_,basistruct_,userparams_,rawuserlist_,invsamplesets_,ipfuns_,opfuns_,testinvsamplesets_,testipfuns_,testopfuns_,boxflavourparams_,cmatseed_,crows_,crank_,testdelays_,testdegs_,rate2sub_,nfunda_,truevals_,ipgrub_]:= 
-Module[{obsdim,datamat,tseries,cmat,opgrub,crequads,crefun,matcarvefun,deldegmat,newchks,newrqs},
+crunchgrub[meff];
+
+simsteps = 
+  2* trajgrub[maxdelays] + trajgrub[maxn] + 1 + crunchgrub[meff];
+
+
+listopnoise = Table[
+					Transpose@ getIIDnoise[{liftgrub[crows] , simsteps+1}, trajgrub[basicdist],trajgrub[covmat] ],
+					{i, nICS}
+					];
+
+trajgrub[noisyQ] = True;
+
+vals = ParallelTable[
+      (
+      trajgrub[rawics] = listotseries[[i]];
+      trajgrub[opnoise] = listopnoise[[i]];
+      meansuboneshot[trajgrub, liftgrub, crunchgrub,<||>]
+      (* Last bit changes when we have already done one pass, and wish to update our numerical checks *)
+      ),
+      {i,nICS}
+      ];
+
+*)
+
+
+
+(* Removed tinit -  Carries noise too *)
+
+ms1shot4trajvariations[trajgrubIP_, liftgrub_,  crunchgrub_, {rawicsIP_,noiseIP_, valselem_}] := Module[{trajgrubOP},
+   trajgrubOP = trajgrubIP;
+   AssociateTo[trajgrubOP, { rawics -> rawicsIP, opnoise -> noiseIP }];
+   meansuboneshot[trajgrubOP, liftgrub, crunchgrub, valselem]
+   ];
+  
+  
+ (* 
+  
+  Estimated eigenvalues:
+
+liftgrub[truevals] = estruevals;
+
+vals = ParallelMap[
+   ms1shot4trajvariations[trajgrub, liftgrub, crunchgrub, #] &, 
+   {listotseries, listopnoise, oldvals}\[Transpose]
+   ];
+
+vals2plotopsVScases[vals, crunchcoords, ncases] 
+   
+   
+   
+   
+   *)
+   
+   
+
+basicmatcarve[mats_, crows_, delays_, deg_,meff_]:= Module[{rowindices, columnindices},
+	rowindices = Range[crows*(1+delays)];
+	columnindices = Range[1 + deg + meff + delays] ; (* Filter (meff) + Gap of dependents (d) + Companiongrub(deg + 1) *)
+	Map[#[[rowindices, columnindices]]&, mats]
+];
+
+
+getcquad[data_,\[Lambda]_,sigtols_,restols_,truevals_,nfunda_,crows_,ndelays_,deg_,meff_, noisyQ_]:=Module[{datapartsflavs},
+(* First create the various inputs for each flavour of Companion DMD *)
+datapartsflavs = prep4cases[data,\[Lambda],truevals,sigtols, restols,nfunda, ndelays, deg, meff, noisyQ];
+MapThread[getcstar[#1,\[Lambda],sigtols,restols,#2,#3,crows,ndelays]&,datapartsflavs]\[Transpose](* [[Attributes, Cases ]]*)
+];
+
+prep4cases[data_,\[Lambda]_,truevals_,sigtols_,restols_,nfunda_, ndelays_, deg_, meff_, noisyQ_]:=
+Module[{zmat,zlambdams,zlambdamsdel,n,evalparts,flavours,dataorgs},
+n = deg;
+zmat =  Take[ Transpose[   data[[1]]  ],-(n+1)]//Transpose ;
+
+zlambdams = getmusubeddatamat[zmat,\[Lambda]];
+zlambdamsdel = Join@@Map[#[zlambdams\[Transpose]]\[Transpose]&,{Most,Rest}];
+
+evalparts = getevalpartitions[truevals,nfunda,n,\[Lambda],restols];
+flavours = {"vanilla","ms","mspres","msdelay"};
+dataorgs = {zmat (* Usual *),zlambdams (* Mean subtracted *),zlambdams (* Remove mean - Preserve \[Lambda]*),zlambdamsdel(* Remove mean, then delay *)};
+{dataorgs,evalparts,flavours}
+]/;(!noisyQ)
+
+
+
+
+prep4cases[{data_,noise_},\[Lambda]_,truevals_,sigtols_, restols_,nfunda_, ndelays_, deg_,meff_, noisyQ_]:=
+Module[{filterNgrub, zpure, znoisy, zTLS, zfilter, znoiseresist, n,evalparts,flavours,dataorgs, filter = <||>, grub = <||>},
+n = deg;
+(* Take the first meff and last n+1 columns please *)
+filterNgrub = {Take[#//Transpose, meff]//Tranpose, Take[#//Transpose, -n-1]//Tranpose}&;
+
+{filter["data"], grub["data"]} = filterNgrub[data];
+{filter["noise"], grub["noise"]} = filterNgrub[noise];
+(* Split data and noise into filter and actual grub *)
+
+(* Companion: Pure data *)
+zpure = grub["data"];
+
+(* Noisy companion: Data + Noise *)
+znoisy = zpure + grub["noise"];
+
+(* TLS Companion: Data + Noise --> SVD thresholding  *)
+zTLS = usvdot@(  (  pickysvd[znoisy, sigtols] )[[1]]);
+
+(* Noise resistant DMD: Noise added to both data matrices --> Inner \
+product with the average in front *)
+zfilter = filter["data"] + filter["noise"];
+znoiseresist = (1/(ndelays + 1))*ConjugateTranspose[zfilter].znoisy;
+
+evalparts = ConstantArray[{truevals, {}}, 4];
+flavours = ConstantArray["vanilla", 4];
+
+dataorgs = {zpure, znoisy, zTLS, znoiseresist};
+{dataorgs,evalparts,flavours}
+];
+
+
+updatednumchks[data_,\[Lambda]_,truevals_,restols_,sigtols_,nfunda_,ndelays_, deg_,meff_, noisyQ_,locquads_]:=
+Module[{dataorgs,evalparts,flavours},
+{dataorgs,evalparts,flavours} = prep4cases[data,\[Lambda],truevals,sigtols,restols,nfunda, ndelays, deg, meff, noisyQ];
+MapThread[numchks4msubthrms[zmat2xmat[#1],#2,#3,sigtols]&,{dataorgs,evalparts,locquads}]
+];
+
+
+
+
+meansuboneshot[grubsNprior__Association]:=Module[{grubs,prior,args},
+{prior,grubs} = TakeDrop[{grubsNprior},-1];
+args = Join[{maxdelays,rawics,opnoise,noisyQ,meff,sigtols,restols,cmatseed,crows,crank,testdelays,testdegs,rate2sub,nfunda,truevals}/.(Normal[Join@@grubs]),prior];
+meansuboneshot@@args
+];
+
+
+
+(*------Generic meansuboneshot that should work for both deterministic and stochastic cases ---------*)
+
+meansuboneshot[ndelays_ ,rawics_,opnoise_,noisyQ_, meff_, sigtols_,restols_,cmatseed_,crows_,crank_,testdelays_,testdegs_,rate2sub_,nfunda_,truevals_,ipgrub_]:= 
+Module[{obsdim,datamat,noisemat,tseries,cmat,opgrub,crequads,crefun,matcarvefun,deldegmat,newchks,newrqs},
 (*-----------------------------*)
 (*------PRELIMINARIES-------*)
 (*-----------------------------*)
@@ -33,54 +198,49 @@ cmat = If[cmatseed == {}(* If unspecified, create using getrandmat *),
 (* Create the ICs*)
 tseries = rawics.Transpose[cmat] ;
 
-(* Create noise matrix here *)
-(* Same dimensions as tseries *)
-(* IID along the rows *)
-
-(* Would ideally give the dimensions required, and the direction of IID ness *)
-(* And out pops the noise matrix*)
-
 
 
 (* The maximally delayed Z matrix *)
-datamat = tseries2bigdatamat[tseries,ndelays-1];
+
+{datamat, noisemat} = Map[tseries2bigdatamat[#,ndelays-1]&, {tseries, opnoise}];  
 
 
 
 
 
 (* Compute c-r-e quads over the desired set of delays, trajectory length / system order *)
-matcarvefun = (
-datamat[[
-	Range[crows*(1+#1)],
-	Range[(* testdegs are better written as testns... and so we need only take one additional column *)
-		1+#2]
-		]]
-		)&;
 
 
-
-
-
-
-
+matcarvefun = basicmatcarve[{datamat,noisemat}, crows, #1, #2,meff]&;
 
 If[ipgrub==<||>,
 (*------------- First computational pass : No priors ----------------*)
 
-crefun =getcquad[matcarvefun[#1,#2],rate2sub,sigtols,restols,truevals,nfunda,crows,#1]&;
+
+
+
+crefun =getcquad[matcarvefun[#1,#2],rate2sub,sigtols,restols,truevals,nfunda,crows,#1,#2, meff,noisyQ]&;
+
+
+
+
+
+
+
+
 crequads=Transpose[Outer[crefun,testdelays,testdegs],{2,3,1,4}];
 opgrub=<|cquads-> crequads[[1]],ratequads-> crequads[[2]],equads-> crequads[[3]] |>,
 
 
-
-
-
 (*------------- Updating numerical checks with new eigenvalue estimates ----------------*)
+
 
 opgrub = ipgrub;
 (* Compute rperror and respercent with truevals whiich is likely a product of estimatruevals*) 
-crefun = updatednumchks[matcarvefun@@#1,rate2sub,truevals,restols,sigtols,nfunda,#2]&;
+
+crefun = updatednumchks[matcarvefun@@#1,rate2sub,truevals,restols,sigtols,nfunda,#1[[1]],#1[[2]], meff, noisyQ, #2]&;
+
+
 deldegmat = Outer[{##}&,testdelays,testdegs];
 newchks = MapThread[crefun,{deldegmat,ipgrub[cquads]},2];
 (*Update opgrub with newchks appropriately *)
@@ -95,3 +255,4 @@ opgrub[ratequads]=newrqs
 
 opgrub
 ];
+

@@ -12,12 +12,12 @@
 (*Get[FileNameJoin[{DirectoryName[NotebookFileName[]],"makefile.m"}]];*)
 
 
-(* ::Subsubsection::Closed:: *)
+(* ::Subsubsection:: *)
 (*Setup Associations (structs in Common) to collect input parameters*)
 
 
 (* ::Input:: *)
-(*{trajgrub,liftgrub,crunchgrub,priorsgrub,testpriorsgrub,plotgrub} = Table[<||>,{i,6}];*)
+(*{trajgrub,liftgrub,crunchgrub,plotgrub} = Table[<||>,{i,4}];*)
 
 
 (* ::Subsubsection::Closed:: *)
@@ -52,13 +52,13 @@
 (*AssociateTo[plotgrub,{mindelays-> 0, minn-> 2,maxdelays-> 20,maxn-> 20}];*)
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*Modify some structs with the given*)
 
 
 (* ::Input:: *)
 (*crunchgrub = Merge[{crunchgrub,plotgrub},First];*)
-(*(* Why do this ?*)*)
+(**)
 (*{crunchgrub[maxdelays],crunchgrub[maxn]} += {4, 4} (* Arbitrary offset *);*)
 (**)
 (*{plotgrub,crunchgrub}=Map[Merge[{#,<|testdelays-> Range[#[mindelays],#[maxdelays]],testdegs-> Range[#[minn],#[maxn]]|>},#[[1]]&]&,{plotgrub,crunchgrub}];*)
@@ -158,7 +158,7 @@
 (*AssociateTo[trajgrub,{tinit -> 0, tsamp -> 1}];*)
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*Generate integrating parameters*)
 
 
@@ -168,10 +168,11 @@
 
 (* ::Input:: *)
 (*simsteps = trajgrub[maxdelays] + trajgrub[maxn] (*+ 1 (* Delay after mean sub*)*) + 1 (* liftedX *);*)
+(*tfinn = trajgrub[tinit] + trajgrub[tsamp]*simsteps;*)
+(**)
 
 
 (* ::Input:: *)
-(*tfinn = trajgrub[tinit] + trajgrub[tsamp]*simsteps;*)
 (*sampackage = {trajgrub[tinit],trajgrub[tsamp],simsteps-1};*)
 
 
@@ -313,51 +314,8 @@
 (*AssociateTo[crunchgrub,{cpow-> 1,tepow-> 1}];*)
 
 
-(* ::Subsubsection:: *)
-(*Flavours  (Redundant)*)
-
-
-(* ::Input:: *)
-(*AssociateTo[priorsgrub,userparams ->  {}];*)
-
-
-(* ::Input:: *)
-(*AssociateTo[priorsgrub,{rawuserlist ->  {}}];*)
-
-
-(* ::Input:: *)
-(*AssociateTo[liftgrub,{flavour ->  "polytri", flavourparams -> 1}];*)
-
-
 (* ::PageBreak:: *)
 (**)
-
-
-(* ::Subsubsection::Closed:: *)
-(*Box parametrization (Redundant)*)
-
-
-(* ::Item:: *)
-(*Utility in future versions*)
-
-
-(* ::Item:: *)
-(*Currently redundant due to *)
-
-
-(* ::Subitem:: *)
-(*Choice of flavour as "polytri"*)
-
-
-(* ::Subitem:: *)
-(*Definition of basislift deployed *)
-
-
-(* ::Input:: *)
-(*boxranges = {{-1,1},{-1,1}};*)
-(*centercounts = {{35,35},{9,9}(* Must be the same as the first to ensure that the scaling is correctly done for trigtri *)};*)
-(*nsampsperbox = {5,5};*)
-(*AssociateTo[liftgrub,boxflavourparams ->  {boxranges,centercounts[[-1]]}];*)
 
 
 (* ::Subsection:: *)
@@ -372,7 +330,7 @@
 (*nICs =50;*)
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*Generate a list of trajectories*)
 
 
@@ -381,7 +339,7 @@
 (*listotseries = Map[getimeseries[#,trajgrub[vfield],trajgrub[tinit],tfinn,sampackage,trajgrub[chosenputty]]&,listoICs];*)
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*Initialize colour-scheme for plots*)
 
 
@@ -403,7 +361,7 @@
 
 (* ::Input:: *)
 (*Print[AbsoluteTime[]];*)
-(*vals =ParallelMap[(trajgrub[rawics] = #;meansuboneshot[trajgrub,liftgrub,priorsgrub,testpriorsgrub,crunchgrub,<||>(* To show that we do not have any prior knowledge of the system: This holds regardless of whether we know liftgrub[truevals] *)])&,listotseries];*)
+(*vals =ParallelMap[(trajgrub[rawics] = #;meansuboneshot[trajgrub,liftgrub,crunchgrub,<||>(* To show that we do not have any prior knowledge of the system: This holds regardless of whether we know liftgrub[truevals] *)])&,listotseries];*)
 (*Print[AbsoluteTime[]];*)
 
 
@@ -412,7 +370,7 @@
 
 
 (* ::Input:: *)
-(*DumpSave[crunchgrub[savefile],{vals,crunchgrub,trajgrub,liftgrub,priorsgrub,testpriorsgrub,basicolourlist,listoICs,listotseries,plotgrub}];*)
+(*DumpSave[crunchgrub[savefile],{vals,crunchgrub,trajgrub,liftgrub,basicolourlist,listoICs,listotseries,plotgrub}];*)
 
 
 (* ::Chapter::Closed:: *)
@@ -435,7 +393,7 @@
 (*DMD-DFT transition*)
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*Parse data into a matrix form*)
 
 
@@ -456,7 +414,7 @@
 (*ensemblechoppeddat = Transpose[Map[ ((#[equads])[[All,All,2,3 (* {cond,condred,tail}*)]])&,vals],{3,1,2}];*)
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*Plot travails*)
 
 
@@ -474,6 +432,10 @@
 
 (* ::Input:: *)
 (*findnprojsintestdegs = (Flatten[Position[crunchgrub[testdegs],liftgrub[nprojs]]])[[1]];*)
+
+
+(* ::Item:: *)
+(*Delays reduce the jump gap from 10^15\[LongRightArrow]10^5 : LTI 1, LTI 2, LTI 3*)
 
 
 (* ::Input:: *)
@@ -605,7 +567,7 @@
 (* ::Input:: *)
 (*liftgrub[truevals] = estruevals;*)
 (**)
-(*vals =ParallelMap[ms1shot4trajvariations[trajgrub,liftgrub,priorsgrub,testpriorsgrub,crunchgrub,#]&,{listoICs,listotseries,oldvals}\[Transpose]];*)
+(*vals =ParallelMap[ms1shot4trajvariations[trajgrub,liftgrub,crunchgrub,#]&,{listoICs,listotseries,oldvals}\[Transpose]];*)
 
 
 (* ::Input:: *)
@@ -619,19 +581,19 @@
 (* ::Input:: *)
 (*liftgrub[truevals] = N@trajgrub[discevals];*)
 (**)
-(*valshonest =ParallelMap[ms1shot4trajvariations[trajgrub,liftgrub,priorsgrub,testpriorsgrub,crunchgrub,#]&,{listoICs,listotseries,oldvals}\[Transpose]];*)
+(*valshonest =ParallelMap[ms1shot4trajvariations[trajgrub,liftgrub,crunchgrub,#]&,{listoICs,listotseries,oldvals}\[Transpose]];*)
 
 
 (* ::Input:: *)
 (*vals2plotopsVScases[valshonest,crunchcoords,ncases]*)
 
 
-(* ::Subsubsection::Closed:: *)
+(* ::Subsubsection:: *)
 (*Save again*)
 
 
 (* ::Input:: *)
-(*DumpSave[crunchgrub[savefile],{oldvals,vals,valshonest,crunchgrub,trajgrub,liftgrub,priorsgrub,testpriorsgrub,basicolourlist,listoICs,plotgrub,simsteps,crunchcoords,ncases}];*)
+(*DumpSave[crunchgrub[savefile],{oldvals,vals,valshonest,crunchgrub,trajgrub,liftgrub,basicolourlist,listoICs,plotgrub,simsteps,crunchcoords,ncases}];*)
 
 
 (* ::PageBreak:: *)
