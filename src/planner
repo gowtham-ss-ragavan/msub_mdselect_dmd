@@ -1,4 +1,41 @@
 
+Noise free LTI seems to be working fine.
+- Some underflow error --> Possibly from using 100s of time delays
+- Minor mod to etvdep2cdeg
+
+Noisy LTI:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

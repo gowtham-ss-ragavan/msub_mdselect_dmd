@@ -139,11 +139,12 @@ coreIIDgen: m,n basicdist ----> m x n matrix of IID noise
 - The direction of IIDness can be anything you choose
 *)
 
-coreIIDgen[{m_,n_}, basicdist_]:= Module[{abstractdist, allsamps},
-	abstractdist = WhiteNoiseProcess[basicdist];
-	allsamps = RandomFunction[abstractdist, {1,m*n}];
-	Partition[allsamps["Values"], n]
-];
+coreIIDgen[{m_, n_}, basicdist_] := 
+  Module[{abstractdist, allsamps}, 
+   abstractdist = WhiteNoiseProcess[basicdist];
+   allsamps = RandomFunction[abstractdist, {1, m*n}];
+   Partition[allsamps["Values"], n]
+   ];
 
 
 (*
@@ -157,15 +158,18 @@ getIIDnoise: {m,n}, basicdist, covmat ---> m \times n matrix, IID along n
 *)
 
 
-getIIDnoise[dims_, basicdist_,covmat_]:=Module[{transform},
-	transform = ConjugateTranpose@CholeskyDecomposition[covmat];
-	transform.coreIIDgen[dims,basicdist]
-];
+getIIDnoise[dims_, basicdist_, covmat_] := 
+  Module[{transform}, 
+   transform = ConjugateTranspose@CholeskyDecomposition[covmat];
+   transform . coreIIDgen[dims, basicdist]
+   ];
 
 
-basicmatcarve[mats_, crows_, delays_, deg_,meff_]:= Module[{rowindices, columnindices},
-	rowindices = Range[crows*(1+delays)];
-	columnindices = Range[1 + deg + meff + delays] ; (* Filter (meff) + Gap of dependents (d) + Companiongrub(deg + 1) *)
-	Map[#[[rowindices, columnindices]]&, mats]
-];
+basicmatcarve[mats_, crows_, delays_, deg_, meff_] := 
+  Module[{rowindices, columnindices}, 
+   rowindices = Range[crows*(1 + delays)];
+   columnindices = Range[1 + deg + meff + delays];
+   (* Filter (meff)+ Gap of dependents (d) + Companiongrub(deg+1) *)
+   Map[#[[rowindices, columnindices]] &, mats]
+   ];
 

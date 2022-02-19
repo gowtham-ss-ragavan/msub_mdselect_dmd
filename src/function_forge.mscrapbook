@@ -170,3 +170,10 @@ opgrub[ratequads]=newrqs
 opgrub
 ];
 
+
+keepthemgoodelays[vals_, crunchgrub_] := Module[{goodstarts},
+   (* Find the index within testdelays that corresponds to delaymin *)
+   goodstarts = Position[Thread[crunchgrub[testdelays] >= crunchgrub[delaymin] ],True];
+   vals[[All(*ICs*), All(*Keys within each Association *),(*Delays*)goodstarts]]
+   ];
+
