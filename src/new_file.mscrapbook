@@ -6,66 +6,6 @@
  or Wolfram/Debug.
 *)
 
-(* 
-coreIIDgen: m,n basicdist ----> m x n matrix of IID noise 
-- The direction of IIDness can be anything you choose
-*)
-
-coreIIDgen[{m_,n_}, basicdist_]:= Module[{abstractdist, allsamps},
-	abstractdist = WhiteNoiseProcess[basicdist];
-	allsamps = RandomFunction[abstractdist, {1,m*n}];
-	Partition[allsamps["Values"], n]
-];
-
-
-(*
-
-getIIDnoise: {m,n}, basicdist, covmat ---> m \times n matrix, IID along n
-
----> basicdist must have zero mean, and unit variance. (Latter to ensure you get the correct covariance matrix, upon using the transform)
-
-
-
-*)
-
-
-getIIDnoise[dims_, basicdist_,covmat_]:=Module[{transform},
-	transform = ConjugateTranpose@CholeskyDecomposition[covmat];
-	transform.coreIIDgen[dims,basicdist]
-];
-
-
-
-
-(* 
-
-crunchgrub[meff];
-
-simsteps = 
-  2* trajgrub[maxdelays] + trajgrub[maxn] + 1 + crunchgrub[meff];
-
-
-listopnoise = Table[
-					Transpose@ getIIDnoise[{liftgrub[crows] , simsteps+1}, trajgrub[basicdist],trajgrub[covmat] ],
-					{i, nICS}
-					];
-
-trajgrub[noisyQ] = True;
-
-vals = ParallelTable[
-      (
-      trajgrub[rawics] = listotseries[[i]];
-      trajgrub[opnoise] = listopnoise[[i]];
-      meansuboneshot[trajgrub, liftgrub, crunchgrub,<||>]
-      (* Last bit changes when we have already done one pass, and wish to update our numerical checks *)
-      ),
-      {i,nICS}
-      ];
-
-*)
-
-
-
 (* Removed tinit -  Carries noise too *)
 
 ms1shot4trajvariations[trajgrubIP_, liftgrub_,  crunchgrub_, {rawicsIP_,noiseIP_, valselem_}] := Module[{trajgrubOP},
@@ -74,33 +14,7 @@ ms1shot4trajvariations[trajgrubIP_, liftgrub_,  crunchgrub_, {rawicsIP_,noiseIP_
    meansuboneshot[trajgrubOP, liftgrub, crunchgrub, valselem]
    ];
   
-  
- (* 
-  
-  Estimated eigenvalues:
-
-liftgrub[truevals] = estruevals;
-
-vals = ParallelMap[
-   ms1shot4trajvariations[trajgrub, liftgrub, crunchgrub, #] &, 
-   {listotseries, listopnoise, oldvals}\[Transpose]
-   ];
-
-vals2plotopsVScases[vals, crunchcoords, ncases] 
-   
-   
-   
-   
-   *)
-   
-   
-
-basicmatcarve[mats_, crows_, delays_, deg_,meff_]:= Module[{rowindices, columnindices},
-	rowindices = Range[crows*(1+delays)];
-	columnindices = Range[1 + deg + meff + delays] ; (* Filter (meff) + Gap of dependents (d) + Companiongrub(deg + 1) *)
-	Map[#[[rowindices, columnindices]]&, mats]
-];
-
+ 
 
 getcquad[data_,\[Lambda]_,sigtols_,restols_,truevals_,nfunda_,crows_,ndelays_,deg_,meff_, noisyQ_]:=Module[{datapartsflavs},
 (* First create the various inputs for each flavour of Companion DMD *)
