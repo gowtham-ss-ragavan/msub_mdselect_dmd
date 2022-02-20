@@ -1,3 +1,10 @@
+(*
+ Wolfram Language scrapbook file.
+
+ The contents can be evaluated by selecting the 
+ file, right-clicking, and choosing Wolfram/Run
+ or Wolfram/Debug.
+*)
 (* ::Package:: *)
 
 (* ::Chapter:: *)
@@ -8,7 +15,7 @@
 (*Run scripts containing functions*)
 
 
-Get[FileNameJoin[{DirectoryName[NotebookFileName[]], "makefile.m"}]];
+Get[ FileNameJoin[{Nest[DirectoryName, NotebookFileName[],2],"examples","makefile.m"}] ];
 
 
 
@@ -33,7 +40,7 @@ AssociateTo[crunchgrub,savefile ->FileBaseName[NotebookFileName[]](* Name savefi
 (*Computation*)
 
 
-(* ::Section::Closed:: *)
+(* ::Section:: *)
 (*Temporal parameters*)
 
 
@@ -350,7 +357,7 @@ basicolourlist = Array[Hue[#]&,Length@crunchgrub[testdelays],{0,0.7 (* The end o
 
 (* ::Input:: *)
 (*liftgrub[truevals] = {};*)
-(*trajgrub[noisyQ]= False(*True*);*)
+(*trajgrub[noisyQ]=(* False*)True;*)
 
 
 (* ::Input:: *)
@@ -408,30 +415,28 @@ basicolourlist = Array[Hue[#]&,Length@crunchgrub[testdelays],{0,0.7 (* The end o
 (*findnprojsintestdegs = (Flatten[Position[crunchgrub[testdegs],liftgrub[nprojs]]])[[1]];*)
 
 
-(* ::Input:: *)
-(*basicBWplot[ensembledat_,colourlist_]:=Module[{tplots},*)
-(*tplots= MapThread[*)
-(*BoxWhiskerChart[splog10[#1],ChartStyle->#2,ChartLabels-> crunchgrub[testdegs],ImageSize->Large,*)
-(*PlotRange->All,LabelStyle->Directive[Black, Medium]]&,*)
-(*{ensembledat,colourlist}];*)
-(*( *)
-(*Show[##,*)
-(*ParametricPlot[{findnprojsintestdegs,t},{t,-17,1},PlotStyle->Hue[0.8],PlotRange->All,ImageSize->Large,LabelStyle->Directive[Black,Medium]]*)
-(*,PlotRange-> All]&)*)
-(*@@(tplots)*)
-(*];*)
+basicBWplot[ensembledat_,colourlist_]:=Module[{tplots},
+tplots= MapThread[
+BoxWhiskerChart[splog10[#1],ChartStyle->#2,ChartLabels-> crunchgrub[testdegs],ImageSize->Large,
+PlotRange->All,LabelStyle->Directive[Black, Medium]]&,
+{ensembledat,colourlist}];
+( 
+Show[##,
+ParametricPlot[{findnprojsintestdegs,t},{t,-17,1},PlotStyle->Hue[0.8],PlotRange->All,ImageSize->Large,LabelStyle->Directive[Black,Medium]]
+,PlotRange-> All]&)
+@@(tplots)
+];
 
 
-(* ::Input:: *)
-(*stdBWplot[ensembledat_,colourlist_,colorlegend_, xlabel_, ylabel_]:= Module[{tplots,transitplot},*)
-(*transitplot = basicBWplot[ensembledat,colourlist];*)
-(*(*Put the correct legend *)*)
-(*(Legended[#,colorlegend]&)@(*On this bunch of plots that have been overlaid *)*)
-(*Show[transitplot,*)
-(*FrameLabel->{{ylabel(*HoldForm[Subscript[Log, 10][Subsuperscript[\[Delta], rel, \[Mu]]]]*),None},{xlabel(*HoldForm[n]*),None}},*)
-(*PlotLabel->None,LabelStyle->{Directive[Black, Medium]}*)
-(*]*)
-(*];*)
+stdBWplot[ensembledat_,colourlist_,colorlegend_, xlabel_, ylabel_]:= Module[{tplots,transitplot},
+transitplot = basicBWplot[ensembledat,colourlist];
+(*Put the correct legend *)
+(Legended[#,colorlegend]&)@(*On this bunch of plots that have been overlaid *)
+Show[transitplot,
+FrameLabel->{{ylabel(*HoldForm[Subscript[Log, 10][Subsuperscript[\[Delta], rel, \[Mu]]]]*),None},{xlabel(*HoldForm[n]*),None}},
+PlotLabel->None,LabelStyle->{Directive[Black, Medium]}
+]
+];
 
 
 (* ::Chapter::Closed:: *)
@@ -442,42 +447,38 @@ basicolourlist = Array[Hue[#]&,Length@crunchgrub[testdelays],{0,0.7 (* The end o
 (*Performance of varying delays for each case*)
 
 
-(* ::Input:: *)
-(*(*1 : Good, 0: Bad*)*)
-(**)
-(*kmdQuality[{valswts_,rperror_,respercent_}]:=1 - Max[1 - Exp[-rperror],respercent];*)
-(*evalsQuality[{valswts_,rperror_,respercent_}]:= Exp[-rperror];*)
+(*1 : Good, 0: Bad*)
+
+kmdQuality[{valswts_,rperror_,respercent_}]:=1 - Max[1 - Exp[-rperror],respercent];
+evalsQuality[{valswts_,rperror_,respercent_}]:= Exp[-rperror];
 
 
-(* ::Input:: *)
-(*kmdQuals = Transpose[*)
-(*Map[*)
-(*Map[kmdQuality,#[ratequads],{3}]&,*)
-(*vals],*)
-(*4 <-> 1];*)
-(**)
-(*kmdplots = Map[stdBWplot[#,basicolourlist,delayscolored,HoldForm[n],HoldForm[Subscript[Log, 10]["KMDQuality"]]]&,kmdQuals];*)
-(**)
-(**)
+kmdQuals = Transpose[
+Map[
+Map[kmdQuality,#[ratequads],{3}]&,
+vals],
+4 <-> 1];
+
+kmdplots = Map[stdBWplot[#,basicolourlist,delayscolored,HoldForm[n],HoldForm[Subscript[Log, 10]["KMDQuality"]]]&,kmdQuals];
+
+
 
 
 (* ::Subsection:: *)
 (*Best delay for all cases*)
 
 
-(* ::Input:: *)
-(*delaychoice = -1; (* Index wrt crunchgrub[testdelays] *)*)
-(*algocolours = {Green, Red, Cyan, Blue};*)
+delaychoice = -1; (* Index wrt crunchgrub[testdelays] *)
+algocolours = {Green, Red, Cyan, Blue};
 
 
-(* ::Input:: *)
-(*algoscoloured = LineLegend[algocolours, {"Companion", "Noisy Companion", "TLS", "Noise-resist Companion"}];*)
-(**)
-(*stdBWplot[kmdQuals[[All,delaychoice]],algocolours,algoscoloured, HoldForm[n],HoldForm[Subscript[Log, 10]["KMDQuality"]]]*)
-(**)
+algoscoloured = LineLegend[algocolours, {"Companion", "Noisy Companion", "TLS", "Noise-resist Companion"}];
+
+stdBWplot[kmdQuals[[All,delaychoice]],algocolours,algoscoloured, HoldForm[n],HoldForm[Subscript[Log, 10]["KMDQuality"]]]
 
 
-(* ::Chapter:: *)
+
+(* ::Chapter::Closed:: *)
 (*Noise-free plots*)
 
 
@@ -532,9 +533,6 @@ basicolourlist = Array[Hue[#]&,Length@crunchgrub[testdelays],{0,0.7 (* The end o
 
 (* ::Subsection:: *)
 (*Determining rmin*)
-
-
-?keepthemgoodelays
 
 
 (* ::Subsubsection:: *)
