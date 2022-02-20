@@ -352,7 +352,8 @@ cvec =Most[bandmat.Flatten[{rawcvec,-1}]]
 ];
 (* try to recover the true modes when you are vanilla, in which case you know the delayed mode is made of iterative scaling of the true mode *)
 filterchoice = If[flavour=="vanilla","yes","no"];
-If[(* 3D and above are cool : Case 1 2D systems (not minn) will not have respercent and rperror computed as they are indistinguishable from No info systems *)Length[Flatten[evalparts]] <= 1,(* If nothing is known about the spectrum, simply compute the PDF using cvec, and set rperror,respercent to HIGH values  *)
+If[Length[Flatten[evalparts]] <= 1,(* If nothing is known about the spectrum, simply compute the PDF using cvec, and set rperror,respercent to HIGH values  *)
+(* 3D and above are cool : Case 1 2D systems (not minn) will not have respercent and rperror computed as they are indistinguishable from No info systems *)
 ratereps = {cX2valswts[cvec,xmat,filterchoice ,crows,ndelays],1,1},
 {rperror,respercent} = numchks4msubthrms[xmat,evalparts,cvec,sigtols];
 ratereps=  {{},rperror,respercent};

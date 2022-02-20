@@ -43,7 +43,7 @@ prep4cases[{data_,noise_},\[Lambda]_,truevals_,sigtols_, restols_,nfunda_, ndela
 Module[{filterNgrub, zpure, znoisy, zTLS, zfilter, znoiseresist, n,evalparts,flavours,dataorgs, filter = <||>, grub = <||>},
 n = deg;
 (* Take the first meff and last n+1 columns please *)
-filterNgrub = {Take[#//Transpose, meff]//Tranpose, Take[#//Transpose, -n-1]//Tranpose}&;
+filterNgrub = {Take[#//Transpose, meff]//Transpose, Take[#//Transpose, -n-1]//Transpose}&;
 
 {filter["data"], grub["data"]} = filterNgrub[data];
 {filter["noise"], grub["noise"]} = filterNgrub[noise];
@@ -64,7 +64,7 @@ zfilter = filter["data"] + filter["noise"];
 znoiseresist = (1/(ndelays + 1))*ConjugateTranspose[zfilter].znoisy;
 
 evalparts = ConstantArray[{truevals, {}}, 4];
-flavours = ConstantArray["vanilla", 4];
+flavours = ConstantArray["ms", 4];
 
 dataorgs = {zpure, znoisy, zTLS, znoiseresist};
 {dataorgs,evalparts,flavours}
@@ -173,7 +173,7 @@ opgrub
 
 keepthemgoodelays[vals_, crunchgrub_] := Module[{goodstarts},
    (* Find the index within testdelays that corresponds to delaymin *)
-   goodstarts = Position[Thread[crunchgrub[testdelays] >= crunchgrub[delaymin] ],True];
+   goodstarts = Flatten@Position[Thread[crunchgrub[testdelays] >= crunchgrub[delaymin] ],True];
    vals[[All(*ICs*), All(*Keys within each Association *),(*Delays*)goodstarts]]
    ];
 
