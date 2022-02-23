@@ -1,6 +1,6 @@
 (* ::Package:: *)
 
-(* ::Chapter:: *)
+(* ::Chapter::Closed:: *)
 (*Initialization*)
 
 
@@ -12,7 +12,7 @@ Get[FileNameJoin[{DirectoryName[NotebookFileName[]], "makefile.m"}]];
 
 
 
-Get[ FileNameJoin[{Nest[DirectoryName, NotebookFileName[],2],"src","function_forge.m"}] ];
+Get[FileNameJoin[{Nest[DirectoryName, NotebookFileName[],2],"src","function_forge.m"}] ];
 
 
 (* ::Subsubsection:: *)
@@ -33,7 +33,7 @@ AssociateTo[crunchgrub,savefile ->FileBaseName[NotebookFileName[]](* Name savefi
 (*Computation*)
 
 
-(* ::Section::Closed:: *)
+(* ::Section:: *)
 (*Temporal parameters*)
 
 
@@ -49,11 +49,10 @@ AssociateTo[crunchgrub,savefile ->FileBaseName[NotebookFileName[]](* Name savefi
 (*DMD model order (n) : minn \[LongRightArrow] maxn*)
 
 
-AssociateTo[plotgrub,{testdelays -> {6, 25, 50, 100, 200, 400}, testdegs-> Range[2,25]}];
+AssociateTo[plotgrub,{testdelays -> (*Range[6,25]*){6,25,50,100,200,400}, testdegs-> Range[2,25]}];
 
 
-
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*Modify some structs with the given*)
 
 
@@ -90,11 +89,13 @@ crunchgrub[maxdelays] = Max@ crunchgrub[testdelays];
 (*VDP : x1'=x2,x2'=\epsilon(1-x1^2)x2-x1 .*)
 
 
-AssociateTo[trajgrub, discevals ->(*RandomReal[{0.8,1.2},7]*Exp[\[ImaginaryI]*RandomReal[{-\[Pi],\[Pi]},7]]  *)Exp[I*(2\[Pi])/7*Range[0,6]](**Exp[\[ImaginaryI]*(2\[Pi])/14] *)]; 
+AssociateTo[trajgrub, discevals ->RandomReal[{0.8,1.2},7]*Exp[I*RandomReal[{-\[Pi],\[Pi]},7]]  (*Exp[I*(2\[Pi])/7*Range[0,6]]*)(**Exp[\[ImaginaryI]*(2\[Pi])/14] *)]; 
 
 
+(*trajgrub[discevals] = Join[RandomReal[{0.8,1},3]*Exp[\[ImaginaryI]*RandomReal[{-\[Pi],\[Pi]},3]],RandomReal[{1,1},4]*Exp[\[ImaginaryI]*RandomReal[{-\[Pi],\[Pi]},4]]];*)
 
-(* ::Subsubsection:: *)
+
+(* ::Subsubsection::Closed:: *)
 (*ssdim:= Dimension of the LTI = "r"*)
 
 
@@ -153,7 +154,7 @@ crunchgrub[meff] = 2*ssdim;
 AssociateTo[trajgrub,{tinit -> 0, tsamp -> 1}];
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*Generate integrating parameters*)
 
 
@@ -167,7 +168,7 @@ tfinn = trajgrub[tinit] + trajgrub[tsamp]*simsteps;
 sampackage = {trajgrub[tinit],trajgrub[tsamp],simsteps-1};
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*Find continuous time version of LTI*)
 
 
@@ -219,7 +220,7 @@ generatingAmat = eval2amat[contevals];
 (*Others: {}*)
 
 
-AssociateTo[liftgrub,{rate2sub -> 1,nfunda-> (* Case 2 always *)(* 2*trajgrub[maxn] *)(* Impute the number you've rigged the system to have *)6(* 13*)}];
+AssociateTo[liftgrub,{rate2sub -> 1,nfunda-> (* Case 2 always *) 2*trajgrub[maxn] (* Impute the number you've rigged the system to have *)(*6*)(* 13*)}];
 AssociateTo[liftgrub,truevals-> trajgrub[discevals](* {} if you don't know what it should be, in which case we don't know what mean subtraction does *)]; 
 
 
@@ -281,7 +282,7 @@ restols ->{10^-8,10^-12}(* greaterabsrelcheck *)}];
 (**)
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*Parameters for cte2wt *)
 
 
@@ -305,7 +306,7 @@ AssociateTo[crunchgrub,{cpow-> 1,tepow-> 1}];
 
 
 trajgrub[basicdist] = UniformDistribution[{-Sqrt[3],Sqrt[3]}] (*1*); (* Zero mean and SD = 1 *)
-trajgrub[noiseSD]= 1;
+trajgrub[noiseSD]= 5;
 
 
 trajgrub[covmat]= trajgrub[noiseSD]^2*IdentityMatrix[liftgrub[crows]];
@@ -323,7 +324,7 @@ trajgrub[covmat]= trajgrub[noiseSD]^2*IdentityMatrix[liftgrub[crows]];
 (*nICs = #[trajectories] to analyse*)
 
 
-nICs =20;
+nICs =50;
 
 
 (* ::Subsubsection:: *)
@@ -349,13 +350,13 @@ basicolourlist = Array[Hue[#]&,Length@crunchgrub[testdelays],{0,0.7 (* The end o
 
 
 (* ::Input:: *)
-(*liftgrub[truevals] = {};*)
-(*trajgrub[noisyQ]= False(*True*);*)
+(*(*liftgrub[truevals] = {};*)*)
+(*trajgrub[noisyQ]= (*False*)True;*)
 
 
 (* ::Input:: *)
 (*Print[AbsoluteTime[]];*)
-(*vals=Table[*)
+(*vals=ParallelTable[*)
 (*(trajgrub[rawics]=listotseries[[i]];*)
 (*trajgrub[opnoise]=listopnoise[[i]];*)
 (*meansuboneshot[trajgrub,liftgrub,crunchgrub,<||>]*)
@@ -388,7 +389,7 @@ basicolourlist = Array[Hue[#]&,Length@crunchgrub[testdelays],{0,0.7 (* The end o
 (*Post-processing*)
 
 
-(* ::Subsubsection::Closed:: *)
+(* ::Subsubsection:: *)
 (*Plot travails*)
 
 
@@ -409,32 +410,34 @@ basicolourlist = Array[Hue[#]&,Length@crunchgrub[testdelays],{0,0.7 (* The end o
 
 
 (* ::Input:: *)
-(*basicBWplot[ensembledat_,colourlist_]:=Module[{tplots},*)
+(*(* Process you data before plotting - Makes labelling more intuitive *)*)
+(*basicBWplot[ensembledat_,colourlist_,{vertmin_,vertmax_},vertcolour_]:=Module[{tplots},*)
 (*tplots= MapThread[*)
-(*BoxWhiskerChart[splog10[#1],ChartStyle->#2,ChartLabels-> crunchgrub[testdegs],ImageSize->Large,*)
+(*BoxWhiskerChart[#1,ChartStyle->#2,ChartLabels-> crunchgrub[testdegs],ImageSize->Large,*)
 (*PlotRange->All,LabelStyle->Directive[Black, Medium]]&,*)
 (*{ensembledat,colourlist}];*)
 (*( *)
 (*Show[##,*)
-(*ParametricPlot[{findnprojsintestdegs,t},{t,-17,1},PlotStyle->Hue[0.8],PlotRange->All,ImageSize->Large,LabelStyle->Directive[Black,Medium]]*)
+(*ParametricPlot[{findnprojsintestdegs,t},{t,vertmin,vertmax},PlotStyle->vertcolour(*Hue[0.8]*),*)
+(*PlotRange->All,ImageSize->Large,LabelStyle->Directive[Black,Medium]]*)
 (*,PlotRange-> All]&)*)
 (*@@(tplots)*)
 (*];*)
-
-
-(* ::Input:: *)
-(*stdBWplot[ensembledat_,colourlist_,colorlegend_, xlabel_, ylabel_]:= Module[{tplots,transitplot},*)
-(*transitplot = basicBWplot[ensembledat,colourlist];*)
+(**)
+(**)
+(**)
+(*stdBWplot[ensembledat_,colourlist_,colorlegend_, xlabel_, ylabel_,vertbounds_,vertcolour_]:= Module[{tplots,transitplot},*)
+(*transitplot = basicBWplot[ensembledat,colourlist,vertbounds,vertcolour];*)
 (*(*Put the correct legend *)*)
 (*(Legended[#,colorlegend]&)@(*On this bunch of plots that have been overlaid *)*)
 (*Show[transitplot,*)
-(*FrameLabel->{{ylabel(*HoldForm[Subscript[Log, 10][Subsuperscript[\[Delta], rel, \[Mu]]]]*),None},{xlabel(*HoldForm[n]*),None}},*)
+(*FrameLabel->{{ylabel,None},{xlabel,None}},*)
 (*PlotLabel->None,LabelStyle->{Directive[Black, Medium]}*)
 (*]*)
 (*];*)
 
 
-(* ::Chapter::Closed:: *)
+(* ::Chapter:: *)
 (*Noisy plots*)
 
 
@@ -445,20 +448,26 @@ basicolourlist = Array[Hue[#]&,Length@crunchgrub[testdelays],{0,0.7 (* The end o
 (* ::Input:: *)
 (*(*1 : Good, 0: Bad*)*)
 (**)
-(*kmdQuality[{valswts_,rperror_,respercent_}]:=1 - Max[1 - Exp[-rperror],respercent];*)
-(*evalsQuality[{valswts_,rperror_,respercent_}]:= Exp[-rperror];*)
+(*kmdQuality[{valswts_,rperror_,respercent_}]:=1 - Max[1 - 10^-rperror,respercent];*)
+(*evalsQuality[{valswts_,rperror_,respercent_}]:= 10^-rperror;*)
+(*explainQuality[{valswts_,rperror_,respercent_}]:= 1-respercent;*)
 
 
 (* ::Input:: *)
+(*(* Cases, Del, Deg, ICs *)*)
 (*kmdQuals = Transpose[*)
 (*Map[*)
 (*Map[kmdQuality,#[ratequads],{3}]&,*)
 (*vals],*)
-(*4 <-> 1];*)
-(**)
-(*kmdplots = Map[stdBWplot[#,basicolourlist,delayscolored,HoldForm[n],HoldForm[Subscript[Log, 10]["KMDQuality"]]]&,kmdQuals];*)
-(**)
-(**)
+(*4 <-> 1*)
+(*];*)
+
+
+(* ::Input:: *)
+(*kmdplots = Map[stdBWplot[#,basicolourlist,delayscolored,"n","KMDQuality",{0,1},Hue[0.8]]&,kmdQuals];*)
+
+
+kmdplots
 
 
 (* ::Subsection:: *)
@@ -466,18 +475,15 @@ basicolourlist = Array[Hue[#]&,Length@crunchgrub[testdelays],{0,0.7 (* The end o
 
 
 (* ::Input:: *)
-(*delaychoice = -1; (* Index wrt crunchgrub[testdelays] *)*)
 (*algocolours = {Green, Red, Cyan, Blue};*)
+(*algoscoloured = LineLegend[algocolours, {"Companion", "Noisy Companion", "TLS", "Noise-resist Companion"}];*)
 
 
 (* ::Input:: *)
-(*algoscoloured = LineLegend[algocolours, {"Companion", "Noisy Companion", "TLS", "Noise-resist Companion"}];*)
-(**)
-(*stdBWplot[kmdQuals[[All,delaychoice]],algocolours,algoscoloured, HoldForm[n],HoldForm[Subscript[Log, 10]["KMDQuality"]]]*)
-(**)
+(*Block[{keep = {3,4,1},delayindex =6},stdBWplot[kmdQuals[[keep,delayindex]],algocolours[[keep]],algoscoloured, "n","KMDQuality",{0,1},Hue[0.8]]]*)
 
 
-(* ::Chapter:: *)
+(* ::Chapter::Closed:: *)
 (*Noise-free plots*)
 
 
@@ -515,7 +521,7 @@ basicolourlist = Array[Hue[#]&,Length@crunchgrub[testdelays],{0,0.7 (* The end o
 
 
 (* ::Input:: *)
-(*stdBWplot[ensembledat,basicolourlist,delayscolored,HoldForm[n],HoldForm[Subscript[Log, 10][\!\(\*SubsuperscriptBox[\(\[Delta]\), \(rel\), \(\[Mu]\)]\)]]]*)
+(*stdBWplot[splog10@ensembledat,basicolourlist,delayscolored,HoldForm[n],HoldForm[Subscript[Log, 10][\!\(\*SubsuperscriptBox[\(\[Delta]\), \(rel\), \(\[Mu]\)]\)]],{-17,1},Hue[0.8]]*)
 
 
 (* ::Subsubsection:: *)
@@ -523,7 +529,7 @@ basicolourlist = Array[Hue[#]&,Length@crunchgrub[testdelays],{0,0.7 (* The end o
 
 
 (* ::Input:: *)
-(*stdBWplot[ensemblechoppeddat,basicolourlist,delayscolored,HoldForm[n],HoldForm[Subscript[Log, 10][Subscript[\[Sigma], Tail]]]]*)
+(*stdBWplot[splog10@ensemblechoppeddat,basicolourlist,delayscolored,HoldForm[n],HoldForm[Subscript[Log, 10][Subscript[\[Sigma], Tail]]],{-17,1},Hue[0.8]]*)
 
 
 (* ::Section:: *)
@@ -532,9 +538,6 @@ basicolourlist = Array[Hue[#]&,Length@crunchgrub[testdelays],{0,0.7 (* The end o
 
 (* ::Subsection:: *)
 (*Determining rmin*)
-
-
-?keepthemgoodelays
 
 
 (* ::Subsubsection:: *)

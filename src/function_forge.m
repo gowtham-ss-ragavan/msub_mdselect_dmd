@@ -7,7 +7,7 @@
 *)
 
 genericpickysvd[x_, sigpicker_] :=
-    Module[ {usv, rawsigmas, sigmas, condandterror},
+    Module[{usv, rawsigmas, sigmas, condandterror},
         (*Get SVD of x*)
         (*UpTo: To compute all Subscript[\[Sigma],i] so that we can threshold ourselves*)
         usv = SingularValueDecomposition[x, UpTo@Min[Dimensions[x]]];
@@ -79,7 +79,8 @@ prep4cases[{data_, noise_}, \[Lambda]_, truevals_, sigtols_, restols_,
         sigpicker = 
          If[ Length[truevals] > 0,
          	(*Retain only as many singular values as there are Koopman EFs*)
-             Fold[sigthresholder, {#, UpTo[Length[truevals]], sigtols}] &,
+         	(*Fold[sigthresholder, {#, UpTo[Length[truevals]], sigtols}] &*)
+             sigthresholder[#, UpTo[Length[truevals]]] &,
              sigthresholder[#, sigtols] &
          ];
         zTLS = lowrankapprox[znoisy, sigpicker];

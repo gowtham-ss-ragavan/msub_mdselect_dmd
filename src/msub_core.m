@@ -339,7 +339,7 @@ dataorgs = {zmat (* Usual *),zlambdams (* Mean subtracted *),zlambdams (* Remove
 (*Works best for systems of dimensions > 2*)
 
 
-getcstar[data_,\[Lambda]_,sigtols_,restols_,evalparts_,flavour_,crows_,ndelays_]:=Module[{xmat,m,n,cvec,cte,pdf,ratereps,bandmat,rawcvec,corevals,auxevals,spuriousvals,rperror,structedc,ncorevals,structevals,structedpdf,structevecs,respercent,filterchoice}, 
+getcstar[data_,\[Lambda]_,sigtols_,restols_,evalparts_,flavour_,crows_,ndelays_]:=Module[{xmat,m,n,cvec,cte,ratereps,bandmat,rawcvec,rperror,respercent,filterchoice}, 
 xmat =zmat2xmat[data];
 {m,n} = Dimensions[xmat];
 If[flavour != "mspres",
@@ -352,12 +352,13 @@ cvec =Most[bandmat.Flatten[{rawcvec,-1}]]
 ];
 (* try to recover the true modes when you are vanilla, in which case you know the delayed mode is made of iterative scaling of the true mode *)
 filterchoice = If[flavour=="vanilla","yes","no"];
-If[Length[Flatten[evalparts]] <= 1,(* If nothing is known about the spectrum, simply compute the PDF using cvec, and set rperror,respercent to HIGH values  *)
-(* 3D and above are cool : Case 1 2D systems (not minn) will not have respercent and rperror computed as they are indistinguishable from No info systems *)
-ratereps = {cX2valswts[cvec,xmat,filterchoice ,crows,ndelays],1,1},
-{rperror,respercent} = numchks4msubthrms[xmat,evalparts,cvec,sigtols];
-ratereps=  {{},rperror,respercent};
-If[flavour=="vanilla",ratereps[[1]] = cX2valswts[cvec,xmat,filterchoice ,crows,ndelays]]
+If[Length[Flatten[evalparts]] <= 1,
+	(* If nothing is known about the spectrum, simply compute the PDF using cvec, and set rperror,respercent to HIGH values  *)
+	(* 3D and above are cool : Case 1 2D systems (not minn) will not have respercent and rperror computed as they are indistinguishable from No info systems *)
+	ratereps = {cX2valswts[cvec,xmat,filterchoice ,crows,ndelays],1,1},
+	{rperror,respercent} = numchks4msubthrms[xmat,evalparts,cvec,sigtols];
+	ratereps=  {{},rperror,respercent};
+	If[flavour=="vanilla",ratereps[[1]] = cX2valswts[cvec,xmat,filterchoice ,crows,ndelays]]
 ];
 {cvec,ratereps,cte}
 ];
