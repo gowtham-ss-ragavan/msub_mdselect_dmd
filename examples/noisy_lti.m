@@ -1,6 +1,6 @@
 (* ::Package:: *)
 
-(* ::Chapter::Closed:: *)
+(* ::Chapter:: *)
 (*Initialization*)
 
 
@@ -15,18 +15,19 @@ Get[FileNameJoin[{DirectoryName[NotebookFileName[]], "makefile.m"}]];
 Get[FileNameJoin[{Nest[DirectoryName, NotebookFileName[],2],"src","function_forge.m"}] ];
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*Setup Associations (structs in Common) to collect input parameters*)
 
 
 {trajgrub,liftgrub,crunchgrub,plotgrub} = Table[<||>,{i,4}];
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*Generate savefile name*)
 
 
 AssociateTo[crunchgrub,savefile ->FileBaseName[NotebookFileName[]](* Name savefile after notebook *) ];
+crunchgrub[plotdir] = FileNameJoin[{FileNameJoin[Drop[FileNameSplit[NotebookFileName[]],-2]],"plots"}];
 
 
 (* ::Chapter:: *)
@@ -49,7 +50,7 @@ AssociateTo[crunchgrub,savefile ->FileBaseName[NotebookFileName[]](* Name savefi
 (*DMD model order (n) : minn \[LongRightArrow] maxn*)
 
 
-AssociateTo[plotgrub,{testdelays -> (*Range[6,25]*){6,25,50,100,200,400}, testdegs-> Range[2,25]}];
+AssociateTo[plotgrub,{testdelays -> Range[0,25](*Range[6,25]*)(*{6,25,50,100,200,400}*), testdegs-> Range[2,25]}];
 
 
 (* ::Subsubsection::Closed:: *)
@@ -89,10 +90,14 @@ crunchgrub[maxdelays] = Max@ crunchgrub[testdelays];
 (*VDP : x1'=x2,x2'=\epsilon(1-x1^2)x2-x1 .*)
 
 
-AssociateTo[trajgrub, discevals ->RandomReal[{0.8,1.2},7]*Exp[I*RandomReal[{-\[Pi],\[Pi]},7]]  (*Exp[I*(2\[Pi])/7*Range[0,6]]*)(**Exp[\[ImaginaryI]*(2\[Pi])/14] *)]; 
+(*AssociateTo[trajgrub, discevals ->RandomReal[{0.8,1.2},7]*Exp[I*RandomReal[{-\[Pi],\[Pi]},7]]  (*Exp[I*(2\[Pi])/7*Range[0,6]]*)(**Exp[\[ImaginaryI]*(2\[Pi])/14] *)]; *)
 
 
-(*trajgrub[discevals] = Join[RandomReal[{0.8,1},3]*Exp[\[ImaginaryI]*RandomReal[{-\[Pi],\[Pi]},3]],RandomReal[{1,1},4]*Exp[\[ImaginaryI]*RandomReal[{-\[Pi],\[Pi]},4]]];*)
+(* ::Text:: *)
+(*UnitDisc + UnitCircle*)
+
+
+trajgrub[discevals] = Join[RandomReal[{1,1},3]*Exp[I*RandomReal[{-\[Pi],\[Pi]},3]],RandomReal[{1,1},4]*Exp[I*RandomReal[{-\[Pi],\[Pi]},4]]];
 
 
 (* ::Subsubsection::Closed:: *)
@@ -327,7 +332,7 @@ trajgrub[covmat]= trajgrub[noiseSD]^2*IdentityMatrix[liftgrub[crows]];
 nICs =50;
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*Generate a list of trajectories*)
 
 
@@ -338,7 +343,7 @@ listotseries = Map[getimeseries[#,trajgrub[vfield],trajgrub[tinit],tfinn,sampack
 listopnoise=Table[Transpose@getIIDnoise[{liftgrub[crows],simsteps+1},trajgrub[basicdist],trajgrub[covmat]],{i,nICs}];
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*Initialize colour-scheme for plots*)
 
 
@@ -350,8 +355,8 @@ basicolourlist = Array[Hue[#]&,Length@crunchgrub[testdelays],{0,0.7 (* The end o
 
 
 (* ::Input:: *)
-(*(*liftgrub[truevals] = {};*)*)
-(*trajgrub[noisyQ]= (*False*)True;*)
+(**)
+(*trajgrub[noisyQ]= True;*)
 
 
 (* ::Input:: *)
@@ -373,7 +378,7 @@ basicolourlist = Array[Hue[#]&,Length@crunchgrub[testdelays],{0,0.7 (* The end o
 (*DumpSave[crunchgrub[savefile],{vals,crunchgrub,trajgrub,liftgrub,basicolourlist,listoICs,listotseries,plotgrub}];*)
 
 
-(* ::Chapter::Closed:: *)
+(* ::Chapter:: *)
 (*Restore-point #1*)
 
 
@@ -389,7 +394,7 @@ basicolourlist = Array[Hue[#]&,Length@crunchgrub[testdelays],{0,0.7 (* The end o
 (*Post-processing*)
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*Plot travails*)
 
 
@@ -398,7 +403,7 @@ basicolourlist = Array[Hue[#]&,Length@crunchgrub[testdelays],{0,0.7 (* The end o
 
 
 (* ::Input:: *)
-(*delayscolored=BarLegend[{basicolourlist,Through[{Min,Max}[crunchgrub[testdelays]]]},crunchgrub[testdelays],LegendLabel->"#[delays]"];*)
+(*delayscolored = BarLegend[{basicolourlist,Through[{Min,Max}[crunchgrub[testdelays]]]},crunchgrub[testdelays],LegendLabel->"#[delays]",LabelStyle->{Directive[Black,15]},LegendMarkerSize->{250}];*)
 
 
 (* ::Text:: *)
@@ -411,34 +416,44 @@ basicolourlist = Array[Hue[#]&,Length@crunchgrub[testdelays],{0,0.7 (* The end o
 
 (* ::Input:: *)
 (*(* Process you data before plotting - Makes labelling more intuitive *)*)
-(*basicBWplot[ensembledat_,colourlist_,{vertmin_,vertmax_},vertcolour_]:=Module[{tplots},*)
+(*basicBWplot[ensembledat_,colourlist_,{vertmin_,vertmax_},vertcolour_]:=Module[{tplots,xlabelspacing = 3,sparseXlabels},*)
+(*(* Plot only a subset of xlabels to avoid cluttering for larger fonts *)*)
+(*(*Replace those whose index %xlabelspacing != 1 with None *)*)
+(*sparseXlabels = sparsifyChartLabels[crunchgrub[testdegs],xlabelspacing];*)
 (*tplots= MapThread[*)
-(*BoxWhiskerChart[#1,ChartStyle->#2,ChartLabels-> crunchgrub[testdegs],ImageSize->Large,*)
-(*PlotRange->All,LabelStyle->Directive[Black, Medium]]&,*)
+(*BoxWhiskerChart[#1,{{"Whiskers",Transparent},{"Fences",Transparent},{"MedianMarker","o",#2}},ChartStyle->#2,ChartLabels-> sparseXlabels,ImageSize->Large,PlotRange->All,LabelStyle->Directive[Black, Medium],Joined->True,BarSpacing ->0.6 (* Allows the Join of Medians to be discerned, if reader is interested *),  PlotTheme->"Scientific"]&,*)
 (*{ensembledat,colourlist}];*)
 (*( *)
-(*Show[##,*)
-(*ParametricPlot[{findnprojsintestdegs,t},{t,vertmin,vertmax},PlotStyle->vertcolour(*Hue[0.8]*),*)
-(*PlotRange->All,ImageSize->Large,LabelStyle->Directive[Black,Medium]]*)
-(*,PlotRange-> All]&)*)
-(*@@(tplots)*)
+(*Show[##,ParametricPlot[{findnprojsintestdegs,t},{t,vertmin,vertmax},PlotStyle->Directive[vertcolour,Dashed](*Hue[0.8]*),PlotRange->All,ImageSize->Large,LabelStyle->Directive[Black,Medium]],PlotRange-> All]&*)
+(*)@@(tplots)*)
 (*];*)
 (**)
-(**)
-(**)
-(*stdBWplot[ensembledat_,colourlist_,colorlegend_, xlabel_, ylabel_,vertbounds_,vertcolour_]:= Module[{tplots,transitplot},*)
-(*transitplot = basicBWplot[ensembledat,colourlist,vertbounds,vertcolour];*)
-(*(*Put the correct legend *)*)
-(*(Legended[#,colorlegend]&)@(*On this bunch of plots that have been overlaid *)*)
-(*Show[transitplot,*)
-(*FrameLabel->{{ylabel,None},{xlabel,None}},*)
-(*PlotLabel->None,LabelStyle->{Directive[Black, Medium]}*)
-(*]*)
-(*];*)
+(*stdBWplot[ensembledat_,colourlist_,colorlegend_,xlabel_,ylabel_,vertbounds_,vertcolour_]:=Module[{tplots,transitplot},transitplot=basicBWplot[ensembledat,colourlist,vertbounds,vertcolour];*)
+(*(*Put the correct legend*)(Legended[#,colorlegend]&)@(*On this bunch of plots that have been overlaid*)Show[transitplot,FrameLabel->{{ylabel,None},{xlabel,None}},PlotLabel->None,LabelStyle->{Directive[Black,20]}]];*)
+
+
+(* ::Input:: *)
+(*kmdplots[key_, fun_, vals_, funname_] := Module[{funnyvals, plots},*)
+(*   (* Cases, Del, Deg, ICs *)*)
+(*   funnyvals = Transpose[*)
+(*     Map[*)
+(*      Map[fun, #[key], {3}] &,*)
+(*      vals],*)
+(*     4 <-> 1*)
+(*     ];*)
+(*   plots = *)
+(*    Map[stdBWplot[#, basicolourlist, delayscolored, "n", *)
+(*       funname, {0, 1}, Hue[0.8]] &, funnyvals];*)
+(*   plots*)
+(*   ];  *)
 
 
 (* ::Chapter:: *)
 (*Noisy plots*)
+
+
+(* ::Input:: *)
+(*plotgrub[casestrings] = {"noise_free","noisy_Companion","TLS","noise_resist_DMD"};*)
 
 
 (* ::Subsection:: *)
@@ -446,28 +461,11 @@ basicolourlist = Array[Hue[#]&,Length@crunchgrub[testdelays],{0,0.7 (* The end o
 
 
 (* ::Input:: *)
-(*(*1 : Good, 0: Bad*)*)
-(**)
-(*kmdQuality[{valswts_,rperror_,respercent_}]:=1 - Max[1 - 10^-rperror,respercent];*)
-(*evalsQuality[{valswts_,rperror_,respercent_}]:= 10^-rperror;*)
-(*explainQuality[{valswts_,rperror_,respercent_}]:= 1-respercent;*)
+(*tplots = kmdplots[ratequads,kmdQuality,vals,"KMDQuality"];*)
 
 
 (* ::Input:: *)
-(*(* Cases, Del, Deg, ICs *)*)
-(*kmdQuals = Transpose[*)
-(*Map[*)
-(*Map[kmdQuality,#[ratequads],{3}]&,*)
-(*vals],*)
-(*4 <-> 1*)
-(*];*)
-
-
-(* ::Input:: *)
-(*kmdplots = Map[stdBWplot[#,basicolourlist,delayscolored,"n","KMDQuality",{0,1},Hue[0.8]]&,kmdQuals];*)
-
-
-kmdplots
+(*savetheseplots[tplots,nametheseplots[#,Map[StringJoin["KMDQuality_",#]&,plotgrub[casestrings]]]&,"png"];*)
 
 
 (* ::Subsection:: *)
@@ -480,194 +478,7 @@ kmdplots
 
 
 (* ::Input:: *)
-(*Block[{keep = {3,4,1},delayindex =6},stdBWplot[kmdQuals[[keep,delayindex]],algocolours[[keep]],algoscoloured, "n","KMDQuality",{0,1},Hue[0.8]]]*)
-
-
-(* ::Chapter::Closed:: *)
-(*Noise-free plots*)
-
-
-(* ::Section:: *)
-(*DMD-DFT transition*)
-
-
-(* ::Subsubsection:: *)
-(*Parse data into a matrix form*)
-
-
-(* ::Text:: *)
-(*Compute \delta_{rel}^{\mu}*)
-
-
-(* ::Input:: *)
-(*ensembledat = Transpose[Map[ Map[obs4c,(#[cquads])[[All,All,2]],{2}]&,vals],{3,1,2}];*)
-
-
-(* ::Text:: *)
-(*Collect \[Kappa](X),\sigma_{tail}(X)*)
-
-
-(* ::Input:: *)
-(*ensembleconditiondat = Transpose[Map[ ((#[equads])[[All,All,2,1]])&,vals],{3,1,2}];*)
-(*ensemblechoppeddat = Transpose[Map[ ((#[equads])[[All,All,2,3 (* {cond,condred,tail}*)]])&,vals],{3,1,2}];*)
-
-
-(* ::Subsection:: *)
-(* Deviation of mean-subtracted DMD from DFT Vs n*)
-
-
-(* ::Item:: *)
-(*Find \hat{r}_{min}, \hat{r}_{max} so that when at least n_{max}-1 delays are taken,  the jump in the indicator  occurs for  \hat{r}_{min} <=  n <= \hat{r}_{max}*)
-
-
-(* ::Input:: *)
-(*stdBWplot[splog10@ensembledat,basicolourlist,delayscolored,HoldForm[n],HoldForm[Subscript[Log, 10][\!\(\*SubsuperscriptBox[\(\[Delta]\), \(rel\), \(\[Mu]\)]\)]],{-17,1},Hue[0.8]]*)
-
-
-(* ::Subsubsection:: *)
-(*Tail of SVD lost in truncation Vs n*)
-
-
-(* ::Input:: *)
-(*stdBWplot[splog10@ensemblechoppeddat,basicolourlist,delayscolored,HoldForm[n],HoldForm[Subscript[Log, 10][Subscript[\[Sigma], Tail]]],{-17,1},Hue[0.8]]*)
-
-
-(* ::Section:: *)
-(*Eigenvalues from multiple time traces : Algorithm 6.1*)
-
-
-(* ::Subsection:: *)
-(*Determining rmin*)
-
-
-(* ::Subsubsection:: *)
-(*Log10[How well is the y-th estimate contained in the x-th estimate] *)
-
-
-(* ::Input:: *)
-(*getetvdepwrtcdeg[vals,crunchgrub]*)
-
-
-(* ::Subsection:: *)
-(*Choose  rmin from the earlier diagnostics*)
-
-
-(* ::Item:: *)
-(*Highest y-coordinate, within \hat{r}_{min}: \hat{r}_{max}, with a row of low values*)
-
-
-(* ::Input:: *)
-(*AssociateTo[crunchgrub,{rmin-> Input["Please enter your guess of rmin ('hat{r}')"](* 7*),chosendeg->  Input["Please enter hat{n} to sample hat{r} from "]}];*)
-
-
-(* ::Subsubsection:: *)
-(*Pick data with sufficient delays and extract their common eigenvalues*)
-
-
-(* ::Input:: *)
-(*AssociateTo[crunchgrub,{delaymin-> crunchgrub[chosendeg]-1}];*)
-(*valswithgoodelays=keepthemgoodelays[onlythequads[vals],crunchgrub];*)
-
-
-(* ::Input:: *)
-(*{prunedrootqfs,estruevals}=sneakyestimatetruevals[valswithgoodelays,crunchgrub,"verbose"];*)
-(*Clear[valswithgoodelays];*)
-
-
-(* ::Subsubsection:: *)
-(*Hausdorff distance between estimated and true eigenvalues*)
-
-
-(* ::Input:: *)
-(*hausdorffdist[estruevals (* Estimated *),trajgrub[discevals] (* True eigenvalues *)]*)
-
-
-(* ::Subsubsection:: *)
-(*Minutia*)
-
-
-(* ::Input:: *)
-(*oldvals = vals;*)
-(*ncases=4;*)
-
-
-(* ::Subsubsection:: *)
-(*Generate coordinates for heatmaps*)
-
-
-(* ::Input:: *)
-(*plotcoords = Flatten[Outer[{##}&,plotgrub[testdelays],plotgrub[testdegs]],1];*)
-(*crunchcoords = Flatten[Outer[{##}&,crunchgrub[testdelays],crunchgrub[testdegs]],1];*)
-
-
-(* ::Section:: *)
-(*Theorem checks*)
-
-
-(* ::Item:: *)
-(*Each case generates a 4 x 2 table of heat-maps, each plot describing the variation of an averaged quantity with respect to #[delays] and n*)
-
-
-(* ::Subitem:: *)
-(*Columns : \[Rho]_{Subset}, \[Delta]_{Trivial}*)
-
-
-(* ::Subitem:: *)
-(*Rows: Theorems for Vanilla, Mean-subtracted, mspres and msdel*)
-
-
-(* ::Item:: *)
-(*All theorems predict that beyond a critical value of n determined by r (the dimension of the underlying Koopman invariant subspace), all heat maps* should exhibit low values*)
-
-
-(* ::Subitem:: *)
-(*The second row is a little subtle and better explained in the manuscript*)
-
-
-(* ::Subsection:: *)
-(*Estimated eigenvalues: \!\(\*OverscriptBox[\(\[Nu]\), \(^\)]\)*)
-
-
-(* ::Input:: *)
-(*liftgrub[truevals] = estruevals;*)
-(**)
-(*vals = ParallelMap[*)
-(*ms1shot4trajvariations[trajgrub, liftgrub, crunchgrub, #] &, *)
-(*{listotseries, listopnoise, oldvals}\[Transpose]*)
-(*];*)
-
-
-(* ::Input:: *)
-(*vals2plotopsVScases[vals,crunchcoords,ncases]*)
-
-
-(* ::Subsection:: *)
-(*True eigenvalues: \sigma(\[CapitalLambda])*)
-
-
-(* ::Input:: *)
-(*liftgrub[truevals] = N@trajgrub[discevals];*)
-(**)
-(*valshonest =ParallelMap[*)
-(*ms1shot4trajvariations[trajgrub, liftgrub, crunchgrub, #] &, *)
-(*{listotseries, listopnoise, oldvals}\[Transpose]*)
-(*];*)
-
-
-(* ::Input:: *)
-(*vals2plotopsVScases[valshonest,crunchcoords,ncases]*)
-
-
-(* ::Subsubsection:: *)
-(*Save again*)
-
-
-(* ::Input:: *)
-(*DumpSave[crunchgrub[savefile],{oldvals,vals,valshonest,crunchgrub,trajgrub,liftgrub,basicolourlist,listoICs,plotgrub,simsteps,crunchcoords,ncases}];*)
-
-
-(* ::PageBreak:: *)
-(**)
+(*Block[{keep = {1,2,3,4},delayindex =1},stdBWplot[kmdQuals[[keep,delayindex]],algocolours[[keep]],algoscoloured, "n","KMDQuality",{0,1},Hue[0.8]]]*)
 
 
 (* ::Chapter::Closed:: *)

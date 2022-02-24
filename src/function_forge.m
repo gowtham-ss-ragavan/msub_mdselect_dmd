@@ -201,3 +201,47 @@ keepthemgoodelays[vals_, crunchgrub_] := Module[{goodstarts},
    vals[[All(*ICs*), All(*Keys within each Association *),(*Delays*)goodstarts]]
    ];
 
+
+(*Intend to create a function that will save variables with plots as their members
+
+SICK of those annoying paint operation to merge these things
+
+Could potentially use this in the future.
+
+I/P: Variable, Function that names the files when given the index, file format
+
+*)
+
+savetheseplots[plotvar_,plotnamer_,format_]:= MapIndexed[Export[StringJoin[plotnamer[#2[[1]]],".",format],#1]&,plotvar];
+
+nametheseplots[i_,casestrings_]:=Module[{systemname = crunchgrub[savefile],nameroot,casename},
+nameroot = FileNameJoin[{crunchgrub[plotdir],systemname}];
+casename = casestrings[[i]];
+StringJoin[nameroot,"_",casename]
+];
+
+
+sparsifyChartLabels[labels_, spacing_] :=
+  MapIndexed[
+   Switch[
+     Mod[#2[[1]], spacing],
+     1, #1,
+     _, " "
+     ] &, labels];
+     
+
+
+
+
+(*1 : Good, 0: Bad*)
+
+kmdQuality[{valswts_, rperror_, respercent_}] := 
+  1 - Max[1 - 10^-rperror, respercent];
+evalsQuality[{valswts_, rperror_, respercent_}] := 10^-rperror;
+explainQuality[{valswts_, rperror_, respercent_}] := 1 - respercent;
+
+ 
+
+
+
+
