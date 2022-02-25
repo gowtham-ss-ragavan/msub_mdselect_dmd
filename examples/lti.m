@@ -93,6 +93,10 @@ crunchgrub[maxdelays] = Max@ crunchgrub[testdelays];
 AssociateTo[trajgrub, discevals ->RandomReal[{0.8,1.2},7]*Exp[I*RandomReal[{-\[Pi],\[Pi]},7]]  (*Exp[I*(2\[Pi])/7*Range[0,6]]*)(**Exp[\[ImaginaryI]*(2\[Pi])/14] *)]; 
 
 
+(* ::Input:: *)
+(*plotgrub[casestrings] = {"vanilla","ms","mspres","msdel"};*)
+
+
 (* ::Text:: *)
 (*UnitDisc + UnitCircle*)
 
@@ -329,7 +333,7 @@ trajgrub[covmat]= trajgrub[noiseSD]^2*IdentityMatrix[liftgrub[crows]];
 (*nICs = #[trajectories] to analyse*)
 
 
-nICs =50;
+nICs =20;
 
 
 (* ::Subsubsection::Closed:: *)
@@ -394,7 +398,7 @@ basicolourlist = Array[Hue[#]&,Length@crunchgrub[testdelays],{0,0.7 (* The end o
 (*Post-processing*)
 
 
-(* ::Subsubsection::Closed:: *)
+(* ::Subsubsection:: *)
 (*Plot travails*)
 
 
@@ -414,50 +418,12 @@ basicolourlist = Array[Hue[#]&,Length@crunchgrub[testdelays],{0,0.7 (* The end o
 (*findnprojsintestdegs = (Flatten[Position[crunchgrub[testdegs],liftgrub[nprojs]]])[[1]];*)
 
 
-(* ::Input:: *)
-(*(* Process you data before plotting - Makes labelling more intuitive *)*)
-(*basicBWplot[ensembledat_,colourlist_,{vertmin_,vertmax_},vertcolour_]:=Module[{tplots,xlabelspacing = 3,sparseXlabels},*)
-(*(* Plot only a subset of xlabels to avoid cluttering for larger fonts *)*)
-(*(*Replace those whose index %xlabelspacing != 1 with None *)*)
-(*sparseXlabels = sparsifyChartLabels[crunchgrub[testdegs],xlabelspacing];*)
-(*tplots= MapThread[*)
-(*BoxWhiskerChart[#1,{{"Whiskers",Transparent},{"Fences",Transparent},{"MedianMarker","o",#2}},ChartStyle->#2,ChartLabels-> sparseXlabels,ImageSize->Large,PlotRange->All,LabelStyle->Directive[Black, Medium],Joined->True,BarSpacing ->0.6 (* Allows the Join of Medians to be discerned, if reader is interested *),  PlotTheme->"Scientific"]&,*)
-(*{ensembledat,colourlist}];*)
-(*( *)
-(*Show[##,ParametricPlot[{findnprojsintestdegs,t},{t,vertmin,vertmax},PlotStyle->Directive[vertcolour,Dashed](*Hue[0.8]*),PlotRange->All,ImageSize->Large,LabelStyle->Directive[Black,Medium]],PlotRange-> All]&*)
-(*)@@(tplots)*)
-(*];*)
-(**)
-(*stdBWplot[ensembledat_,colourlist_,colorlegend_,xlabel_,ylabel_,vertbounds_,vertcolour_]:=Module[{tplots,transitplot},transitplot=basicBWplot[ensembledat,colourlist,vertbounds,vertcolour];*)
-(*(*Put the correct legend*)(Legended[#,colorlegend]&)@(*On this bunch of plots that have been overlaid*)Show[transitplot,FrameLabel->{{ylabel,None},{xlabel,None}},PlotLabel->None,LabelStyle->{Directive[Black,20]}]];*)
-
-
-(* ::Input:: *)
-(*kmdplots[key_, fun_, vals_, funname_] := Module[{funnyvals, plots},*)
-(*   (* Cases, Del, Deg, ICs *)*)
-(*   funnyvals = Transpose[*)
-(*     Map[*)
-(*      Map[fun, #[key], {3}] &,*)
-(*      vals],*)
-(*     4 <-> 1*)
-(*     ];*)
-(*   plots = *)
-(*    Map[stdBWplot[#, basicolourlist, delayscolored, "n", *)
-(*       funname, {0, 1}, Hue[0.8]] &, funnyvals];*)
-(*   plots*)
-(*   ];  *)
-
-
 (* ::Chapter:: *)
 (*Noise-free plots*)
 
 
 (* ::Section:: *)
 (*DMD-DFT transition*)
-
-
-(* ::Input:: *)
-(*plotgrub[casestrings] = {"vanilla","ms","mspres","msdel"};*)
 
 
 (* ::Subsubsection:: *)
@@ -490,11 +456,11 @@ basicolourlist = Array[Hue[#]&,Length@crunchgrub[testdelays],{0,0.7 (* The end o
 
 
 (* ::Input:: *)
-(*dmddftdeviationplot = stdBWplot[splog10@ensembledat,basicolourlist,delayscolored,HoldForm[n],HoldForm[Subscript[Log, 10][\!\(\*SubsuperscriptBox[\(\[Delta]\), \(rel\), \(\[Mu]\)]\)]],{-17,1},Hue[0.8]]*)
+(*dmddftdeviationplot = stdBWplot[crunchgrub[testdegs],splog10@ensembledat,basicolourlist,delayscolored,HoldForm[n],HoldForm[Subscript[Log, 10][\!\(\*SubsuperscriptBox[\(\[Delta]\), \(rel\), \(\[Mu]\)]\)]],{-17,1},Hue[0.8]]*)
 
 
 (* ::Input:: *)
-(*savetheseplots[{dmddftdeviationplot },nametheseplots[#,{"dmddftdeviation"}]&,"eps"];*)
+(*savetheseplots[{dmddftdeviationplot },nametheseplots[#,{"dmddftdeviation"}]&,"png"];*)
 
 
 (* ::Subsubsection:: *)
@@ -502,7 +468,7 @@ basicolourlist = Array[Hue[#]&,Length@crunchgrub[testdelays],{0,0.7 (* The end o
 
 
 (* ::Input:: *)
-(*stdBWplot[splog10@ensemblechoppeddat,basicolourlist,delayscolored,HoldForm[n],HoldForm[Subscript[Log, 10][Subscript[\[Sigma], Tail]]],{-17,1},Hue[0.8]]*)
+(*stdBWplot[crunchgrub[testdegs],splog10@ensemblechoppeddat,basicolourlist,delayscolored,HoldForm[n],HoldForm[Subscript[Log, 10][Subscript[\[Sigma], Tail]]],{-17,1},Hue[0.8]]*)
 
 
 (* ::Section:: *)
@@ -611,11 +577,11 @@ basicolourlist = Array[Hue[#]&,Length@crunchgrub[testdelays],{0,0.7 (* The end o
 
 
 (* ::Input:: *)
-(*estimateplots = kmdplots[ratequads,kmdQuality,vals,"KMDQuality"]*)
+(*estimateplots = kmdplots[crunchgrub[testdegs],ratequads,kmdQuality,vals,"KMDQuality",basicolourlist,delayscolored]*)
 
 
 (* ::Input:: *)
-(*savetheseplots[estimateplots,nametheseplots[#,Map[StringJoin["estimatevals_",#]&,plotgrub[casestrings]]]&,"png"];*)
+(*savetheseplots[estimateplots,nametheseplots[#,prefixstrlist["estimatevals_",plotgrub[casestrings]]]&,"png"];*)
 
 
 (* ::Subsection:: *)
@@ -632,11 +598,11 @@ basicolourlist = Array[Hue[#]&,Length@crunchgrub[testdelays],{0,0.7 (* The end o
 
 
 (* ::Input:: *)
-(*truthplots = kmdplots[ratequads,kmdQuality,valshonest,"KMDQuality"]*)
+(*truthplots = kmdplots[crunchgrub[testdegs],ratequads,kmdQuality,valshonest,"KMDQuality",basicolourlist,delayscolored]*)
 
 
 (* ::Input:: *)
-(*savetheseplots[truthplots,nametheseplots[#,Map[StringJoin["truevals_",#]&,plotgrub[casestrings]]]&,"png"];*)
+(*savetheseplots[truthplots,nametheseplots[#,prefixstrlist["truevals_",plotgrub[casestrings]]]&,"png"];*)
 
 
 (* ::Subsubsection:: *)

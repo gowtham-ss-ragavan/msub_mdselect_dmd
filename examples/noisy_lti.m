@@ -329,7 +329,7 @@ trajgrub[covmat]= trajgrub[noiseSD]^2*IdentityMatrix[liftgrub[crows]];
 (*nICs = #[trajectories] to analyse*)
 
 
-nICs =50;
+nICs = 20;
 
 
 (* ::Subsubsection::Closed:: *)
@@ -355,7 +355,6 @@ basicolourlist = Array[Hue[#]&,Length@crunchgrub[testdelays],{0,0.7 (* The end o
 
 
 (* ::Input:: *)
-(**)
 (*trajgrub[noisyQ]= True;*)
 
 
@@ -414,40 +413,6 @@ basicolourlist = Array[Hue[#]&,Length@crunchgrub[testdelays],{0,0.7 (* The end o
 (*findnprojsintestdegs = (Flatten[Position[crunchgrub[testdegs],liftgrub[nprojs]]])[[1]];*)
 
 
-(* ::Input:: *)
-(*(* Process you data before plotting - Makes labelling more intuitive *)*)
-(*basicBWplot[ensembledat_,colourlist_,{vertmin_,vertmax_},vertcolour_]:=Module[{tplots,xlabelspacing = 3,sparseXlabels},*)
-(*(* Plot only a subset of xlabels to avoid cluttering for larger fonts *)*)
-(*(*Replace those whose index %xlabelspacing != 1 with None *)*)
-(*sparseXlabels = sparsifyChartLabels[crunchgrub[testdegs],xlabelspacing];*)
-(*tplots= MapThread[*)
-(*BoxWhiskerChart[#1,{{"Whiskers",Transparent},{"Fences",Transparent},{"MedianMarker","o",#2}},ChartStyle->#2,ChartLabels-> sparseXlabels,ImageSize->Large,PlotRange->All,LabelStyle->Directive[Black, Medium],Joined->True,BarSpacing ->0.6 (* Allows the Join of Medians to be discerned, if reader is interested *),  PlotTheme->"Scientific"]&,*)
-(*{ensembledat,colourlist}];*)
-(*( *)
-(*Show[##,ParametricPlot[{findnprojsintestdegs,t},{t,vertmin,vertmax},PlotStyle->Directive[vertcolour,Dashed](*Hue[0.8]*),PlotRange->All,ImageSize->Large,LabelStyle->Directive[Black,Medium]],PlotRange-> All]&*)
-(*)@@(tplots)*)
-(*];*)
-(**)
-(*stdBWplot[ensembledat_,colourlist_,colorlegend_,xlabel_,ylabel_,vertbounds_,vertcolour_]:=Module[{tplots,transitplot},transitplot=basicBWplot[ensembledat,colourlist,vertbounds,vertcolour];*)
-(*(*Put the correct legend*)(Legended[#,colorlegend]&)@(*On this bunch of plots that have been overlaid*)Show[transitplot,FrameLabel->{{ylabel,None},{xlabel,None}},PlotLabel->None,LabelStyle->{Directive[Black,20]}]];*)
-
-
-(* ::Input:: *)
-(*kmdplots[key_, fun_, vals_, funname_] := Module[{funnyvals, plots},*)
-(*   (* Cases, Del, Deg, ICs *)*)
-(*   funnyvals = Transpose[*)
-(*     Map[*)
-(*      Map[fun, #[key], {3}] &,*)
-(*      vals],*)
-(*     4 <-> 1*)
-(*     ];*)
-(*   plots = *)
-(*    Map[stdBWplot[#, basicolourlist, delayscolored, "n", *)
-(*       funname, {0, 1}, Hue[0.8]] &, funnyvals];*)
-(*   plots*)
-(*   ];  *)
-
-
 (* ::Chapter:: *)
 (*Noisy plots*)
 
@@ -461,11 +426,11 @@ basicolourlist = Array[Hue[#]&,Length@crunchgrub[testdelays],{0,0.7 (* The end o
 
 
 (* ::Input:: *)
-(*tplots = kmdplots[ratequads,kmdQuality,vals,"KMDQuality"];*)
+(*tplots = kmdplots[crunchgrub[testdegs],ratequads,kmdQuality,vals,"KMDQuality",basicolourlist,delayscolored];*)
 
 
 (* ::Input:: *)
-(*savetheseplots[tplots,nametheseplots[#,Map[StringJoin["KMDQuality_",#]&,plotgrub[casestrings]]]&,"png"];*)
+(*savetheseplots[tplots,nametheseplots[#,prefixstrlist["KMDQuality_",plotgrub[casestrings]]]&,"png"];*)
 
 
 (* ::Subsection:: *)
@@ -478,7 +443,16 @@ basicolourlist = Array[Hue[#]&,Length@crunchgrub[testdelays],{0,0.7 (* The end o
 
 
 (* ::Input:: *)
-(*Block[{keep = {1,2,3,4},delayindex =1},stdBWplot[kmdQuals[[keep,delayindex]],algocolours[[keep]],algoscoloured, "n","KMDQuality",{0,1},Hue[0.8]]]*)
+(*kmdQuals = Transpose[*)
+(*          Map[*)
+(*            Map[kmdQuality, #[ratequads], {3}] &,*)
+(*            vals],*)
+(*          4 <-> 1*)
+(*          ];*)
+
+
+(* ::Input:: *)
+(*Block[{keep = {1,2,3,4},delayindex =-2},stdBWplot[crunchgrub[testdegs],kmdQuals[[keep,delayindex]],algocolours[[keep]],algoscoloured, "n","KMDQuality",{0,1},Hue[0.8]]]*)
 
 
 (* ::Chapter::Closed:: *)

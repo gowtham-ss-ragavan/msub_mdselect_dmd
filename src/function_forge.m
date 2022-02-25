@@ -241,7 +241,61 @@ evalsQuality[{valswts_, rperror_, respercent_}] := 10^-rperror;
 explainQuality[{valswts_, rperror_, respercent_}] := 1 - respercent;
 
  
+prefixstrlist[prefix_,strlist_]:=Map[StringJoin[prefix,#]&,strlist];
+
+(* Process you data before plotting - Makes labelling more intuitive *)
 
 
+basicBWplot[allXlabels_, ensembledat_, 
+   colourlist_, {vertmin_, vertmax_}, vertcolour_] := 
+  Module[{tplots, xlabelspacing = 3, sparseXlabels},
+   (* Plot only a subset of xlabels to avoid cluttering for larger \
+fonts *)
+   (*Replace those whose index %xlabelspacing != 1 with None *)
+   sparseXlabels = sparsifyChartLabels[allXlabels, xlabelspacing];
+   tplots = MapThread[
+     BoxWhiskerChart[#1, {{"Whiskers", Transparent}, {"Fences", 
+         Transparent}, {"MedianMarker", "o", #2}}, ChartStyle -> #2, 
+       ChartLabels -> sparseXlabels, ImageSize -> Large, 
+       PlotRange -> All, LabelStyle -> Directive[Black, Medium], 
+       Joined -> True, BarSpacing -> 0.6 (* 
+       Allows the Join of Medians to be discerned, 
+       if reader is interested *),  PlotTheme -> "Scientific"] &,
+     {ensembledat, colourlist}];
+   ( 
+     Show[##, 
+       ParametricPlot[{findnprojsintestdegs, t}, {t, vertmin, 
+         vertmax}, PlotStyle -> Directive[vertcolour, Dashed](*Hue[
+        0.8]*), PlotRange -> All, ImageSize -> Large, 
+        LabelStyle -> Directive[Black, Medium]], PlotRange -> All] &
+     ) @@ (tplots)
+   ];
 
+stdBWplot[allXlabels_, ensembledat_, colourlist_, colorlegend_, 
+   xlabel_, ylabel_, vertbounds_, vertcolour_] := 
+  Module[{transitplot},
+   transitplot = 
+    basicBWplot[allXlabels, ensembledat, colourlist, vertbounds, 
+     vertcolour];
+   (*Put the correct legend*)(Legended[#, 
+       colorlegend] &)@(*On this bunch of plots that have been \
+overlaid*)Show[transitplot, 
+     FrameLabel -> {{ylabel, None}, {xlabel, None}}, 
+     PlotLabel -> None, LabelStyle -> {Directive[Black, 20]}]
+   ];
+
+kmdplots[allXlabels_, key_, fun_, vals_, funname_, colourlist_(**), 
+   colorlegend_(**)] := Module[{funnyvals, plots},
+      (* Cases, Del, Deg, ICs *)
+      funnyvals = Transpose[
+          Map[
+            Map[fun, #[key], {3}] &,
+            vals],
+          4 <-> 1
+          ];
+      plots = 
+        Map[stdBWplot[allXlabels, #, colourlist , colorlegend, "n", 
+              funname, {0, 1}, Hue[0.8]] &, funnyvals];
+      plots
+      ];  
 
