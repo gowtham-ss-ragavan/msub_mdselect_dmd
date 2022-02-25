@@ -1,23 +1,25 @@
 (* ::Package:: *)
 
-(* ::Chapter:: *)
+(* ::Chapter::Closed:: *)
 (*Initialization*)
 
 
-(* ::Subsubsection::Closed:: *)
+(* ::Subsubsection:: *)
 (*Run scripts containing functions*)
 
 
-(* ::Input:: *)
-(*Get[FileNameJoin[{DirectoryName[NotebookFileName[]],"makefile.m"}]];*)
+Get[FileNameJoin[{DirectoryName[NotebookFileName[]], "makefile.m"}]];
 
 
-(* ::Subsubsection::Closed:: *)
+
+Get[FileNameJoin[{Nest[DirectoryName, NotebookFileName[],2],"src","function_forge.m"}] ];
+
+
+(* ::Subsubsection:: *)
 (*Setup Associations (structs in Common) to collect input parameters*)
 
 
-(* ::Input:: *)
-(*{trajgrub,liftgrub,priorsgrub,testpriorsgrub,crunchgrub,plotgrub} = Table[<||>,{i,6}];*)
+{trajgrub,liftgrub,crunchgrub,plotgrub} = Table[<||>,{i,4}];
 
 
 (* ::Subsection:: *)
@@ -32,15 +34,17 @@
 (*AssociateTo[trajgrub, vfield-> "20k"]; *)
 
 
-(* ::Subsubsection::Closed:: *)
+(* ::Subsubsection:: *)
 (*Generate savefile name*)
 
 
 (* ::Input:: *)
 (*AssociateTo[crunchgrub, savefile -> StringJoin[{FileBaseName[NotebookFileName[]] , "_vals_", trajgrub[vfield]}]];*)
+(**)
+(*crunchgrub[plotdir] = FileNameJoin[{FileNameJoin[Drop[FileNameSplit[NotebookFileName[]],-2]],"plots"}];*)
 
 
-(* ::Chapter::Closed:: *)
+(* ::Chapter:: *)
 (*Computations*)
 
 
@@ -60,20 +64,16 @@
 (*DMD model order (n) : minn \[LongRightArrow] maxn*)
 
 
-(* ::Input:: *)
-(*AssociateTo[plotgrub,{mindelays-> 0, minn-> 2,maxdelays->25,maxn-> 25}];*)
+AssociateTo[plotgrub,{testdelays -> Range[0,25](*{6,25,50,100,200,400}*), testdegs-> Range[2,25]}];
 
 
-(* ::Subsubsection::Closed:: *)
+(* ::Subsubsection:: *)
 (*Modify some structs with the given*)
 
 
-(* ::Input:: *)
-(*crunchgrub = Merge[{crunchgrub,plotgrub},First];*)
-(**)
-(*{crunchgrub[maxdelays],crunchgrub[maxn]} += {4, 4} (* Arbitrary offset *);*)
-(**)
-(*{plotgrub,crunchgrub}=Map[Merge[{#,<|testdelays-> Range[#[mindelays],#[maxdelays]],testdegs-> Range[#[minn],#[maxn]]|>},#[[1]]&]&,{plotgrub,crunchgrub}];*)
+crunchgrub = Merge[{crunchgrub, plotgrub}, First];
+crunchgrub[maxdelays] = Max@ crunchgrub[testdelays];
+
 
 
 (* ::Subsection:: *)
@@ -84,7 +84,7 @@
 (*AssociateTo[trajgrub, chosenputty -> (#&) ];*)
 
 
-(* ::Subsubsection::Closed:: *)
+(* ::Subsubsection:: *)
 (*Get addresses and load the cavity data*)
 
 
@@ -98,9 +98,14 @@
 
 (* ::Input:: *)
 (*Get[trajgrub[prunedata]];*)
+(**)
 
 
-(* ::Subsubsection::Closed:: *)
+(* ::Input:: *)
+(*plotgrub[casestrings] = {"vanilla","ms","mspres","msdel"};*)
+
+
+(* ::Subsubsection:: *)
 (*ssdim:= #[grid-points] that sample*)
 
 
@@ -136,9 +141,9 @@
 (*In addition,  crank = ssdim & crows >= ssdim ensures that "C" has full column rank*)
 
 
-(* ::Input:: *)
-(*AssociateTo[liftgrub,{cmatseed-> {},crank ->ssdim (*1*), crows -> 2*ssdim (**)  , nprojs -> ssdim (* \[LessEqual] ssdim ...tis simply the number of non-zero entires in the IC*)}];*)
-(**)
+AssociateTo[liftgrub,{cmatseed-> {},crank ->(*ssdim *)1, crows -> 1 (**)  , nprojs -> ssdim (* \[LessEqual] ssdim ...tis simply the number of non-zero entires in the IC*)}];
+
+crunchgrub[meff] = 2*ssdim;
 
 
 (* ::Subsection:: *)
@@ -161,16 +166,14 @@
 (*AssociateTo[trajgrub,{tinit -> 0, tsamp -> 0.05}];*)
 
 
-(* ::Subsubsection::Closed:: *)
+(* ::Subsubsection:: *)
 (*Generate integrating parameters*)
 
 
-(* ::Input:: *)
-(*AssociateTo[trajgrub,{maxdelays ->  Max@crunchgrub[testdelays], maxn-> Max@crunchgrub[testdegs]}];*)
+AssociateTo[trajgrub,{maxdelays ->  Max@crunchgrub[testdelays], maxn-> Max@crunchgrub[testdegs]}];
 
 
-(* ::Input:: *)
-(*simsteps = trajgrub[maxdelays] + trajgrub[maxn] (*+ 1 (* Delay after mean sub*)*) + 1 (* liftedX *);*)
+simsteps=2*trajgrub[maxdelays]+trajgrub[maxn]+1+crunchgrub[meff];
 
 
 (* ::Subsection:: *)
@@ -272,51 +275,19 @@
 (*AssociateTo[crunchgrub,{cpow-> 1,tepow-> 1}];*)
 
 
-(* ::Subsubsection::Closed:: *)
-(*Flavours  (Redundant)*)
+(* ::Subsubsection:: *)
+(*Noise parameters:*)
 
 
-(* ::Input:: *)
-(*AssociateTo[priorsgrub,userparams ->  {}];*)
+trajgrub[basicdist] = UniformDistribution[{-Sqrt[3],Sqrt[3]}] (*1*); (* Zero mean and SD = 1 *)
+trajgrub[noiseSD]= 5;
 
 
-(* ::Input:: *)
-(*AssociateTo[priorsgrub,{rawuserlist ->  {}}];*)
-
-
-(* ::Input:: *)
-(*AssociateTo[liftgrub,{flavour ->  "polytri", flavourparams -> 1}];*)
+trajgrub[covmat]= trajgrub[noiseSD]^2*IdentityMatrix[liftgrub[crows]];
 
 
 (* ::PageBreak:: *)
 (**)
-
-
-(* ::Subsubsection::Closed:: *)
-(*Box parametrization (Redundant)*)
-
-
-(* ::Item:: *)
-(*Utility in future versions*)
-
-
-(* ::Item:: *)
-(*Currently redundant due to *)
-
-
-(* ::Subitem:: *)
-(*Choice of flavour as "polytri"*)
-
-
-(* ::Subitem:: *)
-(*Definition of basislift deployed *)
-
-
-(* ::Input:: *)
-(*boxranges = {{-1,1},{-1,1}};*)
-(*centercounts = {{35,35},{9,9}(* Must be the same as the first to ensure that the scaling is correctly done for trigtri *)};*)
-(*nsampsperbox = {5,5};*)
-(*AssociateTo[liftgrub,boxflavourparams ->  {boxranges,centercounts[[-1]]}];*)
 
 
 (* ::Subsection:: *)
@@ -328,10 +299,10 @@
 
 
 (* ::Input:: *)
-(*nICs =30;*)
+(*nICs = 50;*)
 
 
-(* ::Subsubsection::Closed:: *)
+(* ::Subsubsection:: *)
 (*Generate a list of trajectories (special to cavity)*)
 
 
@@ -347,10 +318,13 @@
 (* ::Input:: *)
 (*(* So, we only store like the start points *)*)
 (*listoICs= RandomSample[choices4IC,nICs];*)
-(*listotseries = Map[((velocityfield[cavityPsi])[[All,Range[0,simsteps]+#]])\[Transpose](* Trasnpose coz the cavityPsi is in snapshot form *)&,listoICs];*)
+(*listotseries = Map[((velocityfield[cavityPsi])[[All,Range[0,simsteps]+#]])\[Transpose](* Transpose coz the cavityPsi is in snapshot form *)&,listoICs];*)
 
 
-(* ::Subsubsection::Closed:: *)
+listopnoise=Table[Transpose@getIIDnoise[{liftgrub[crows],simsteps+1},trajgrub[basicdist],trajgrub[covmat]],{i,nICs}];
+
+
+(* ::Subsubsection:: *)
 (*Initialize colour-scheme for plots*)
 
 
@@ -368,13 +342,17 @@
 
 (* ::Input:: *)
 (*liftgrub[truevals] = {};*)
+(*trajgrub[noisyQ]= False;*)
 
 
 (* ::Input:: *)
 (*Print[AbsoluteTime[]];*)
-(**)
-(*vals=ParallelMap[(trajgrub[tinit]=#[[1]](* THe index, not the actual tinit *);trajgrub[rawics]=#[[2]];meansuboneshot[trajgrub,liftgrub,priorsgrub,testpriorsgrub,crunchgrub,<||>(* To show that we do not have any prior knowledge of the system: This holds regardless of whether we know liftgrub[truevals] *)])&,{listoICs,listotseries}\[Transpose]];*)
-(**)
+(*vals=ParallelTable[*)
+(*(trajgrub[rawics]=listotseries[[i]];*)
+(*trajgrub[opnoise]=listopnoise[[i]];*)
+(*meansuboneshot[trajgrub,liftgrub,crunchgrub,<||>]*)
+(*(*Last bit changes when we have already done one pass,and wish to update our numerical checks*)),*)
+(*{i,nICs}];*)
 (*Print[AbsoluteTime[]];*)
 
 
@@ -383,10 +361,10 @@
 
 
 (* ::Input:: *)
-(*DumpSave[crunchgrub[savefile],{vals,crunchgrub,trajgrub,liftgrub,priorsgrub,testpriorsgrub,basicolourlist,listoICs,plotgrub,simsteps}];*)
+(*DumpSave[crunchgrub[savefile],{vals,crunchgrub,trajgrub,liftgrub,basicolourlist,listoICs,listotseries,plotgrub}];*)
 
 
-(* ::Chapter::Closed:: *)
+(* ::Chapter:: *)
 (*Restore-point #1*)
 
 
@@ -396,6 +374,7 @@
 (*Get[trajgrub[prunedata]];*)
 (*(* Generate your trajectories *)*)
 (*listotseries = Map[((velocityfield[cavityPsi])[[All,Range[0,simsteps]+#]])\[Transpose](* Trasnpose coz the cavityPsi is in snapshot form *)&,listoICs];*)
+(*listopnoise=Table[Transpose@getIIDnoise[{liftgrub[crows],simsteps+1},trajgrub[basicdist],trajgrub[covmat]],{i,nICs}];*)
 (*(* UNdo all changes *)*)
 (*If[ValueQ[oldvals],liftgrub[truevals]={};*)
 (*KeyDropFrom[crunchgrub,{rmin,delaymin,chosendeg}];vals = oldvals];*)*)
@@ -405,11 +384,35 @@
 (*Post-processing*)
 
 
+(* ::Subsubsection:: *)
+(*Plot travails*)
+
+
+(* ::Text:: *)
+(*Legend for colour scheme*)
+
+
+(* ::Input:: *)
+(*delayscolored = BarLegend[{basicolourlist,Through[{Min,Max}[crunchgrub[testdelays]]]},crunchgrub[testdelays],LegendLabel->"#[delays]",LabelStyle->{Directive[Black,15]},LegendMarkerSize->{250}];*)
+
+
+(* ::Text:: *)
+(*Locate position of "r" within degrees("n") being tested*)
+
+
+(* ::Item:: *)
+(*No use for VDP and cavity - > IS this the best inert value it can be given ?*)
+
+
+(* ::Input:: *)
+(*findnprojsintestdegs = (crunchgrub[testdegs])[[1]] ;*)
+
+
 (* ::Section:: *)
 (*DMD-DFT transition*)
 
 
-(* ::Subsubsection::Closed:: *)
+(* ::Subsubsection:: *)
 (*Parse data into a matrix form*)
 
 
@@ -430,29 +433,8 @@
 (*ensemblechoppeddat = Transpose[Map[ ((#[equads])[[All,All,2,3 (* {cond,condred,tail}*)]])&,vals],{3,1,2}];*)
 
 
-(* ::Subsubsection::Closed:: *)
-(*Plot travails*)
-
-
-(* ::Text:: *)
-(*Legend for colour scheme*)
-
-
-(* ::Input:: *)
-(*delayscolored=BarLegend[{basicolourlist,Through[{Min,Max}[crunchgrub[testdelays]]]},crunchgrub[testdelays],LegendLabel->"#[delays]"];*)
-
-
-(* ::Input:: *)
-(*tplots=MapThread[BoxWhiskerChart[splog10[#1],ChartStyle->#2,ChartLabels-> crunchgrub[testdegs],ImageSize->Large,PlotRange->All,LabelStyle->Directive[Black, Medium]]&,{ensembledat,basicolourlist}];*)
-
-
-(* ::Input:: *)
-(*(*lengthoftplots=Length@tplots;*)
-(*Manipulate[tplots[[i]],{i,1,lengthoftplots,1}]*)*)
-
-
 (* ::Subsection:: *)
-(* Deviation of mean-subtracted DMD from DFT Vs Order of DMD model (n)*)
+(* Deviation of mean-subtracted DMD from DFT Vs n*)
 
 
 (* ::Item:: *)
@@ -460,16 +442,19 @@
 
 
 (* ::Input:: *)
-(*transitplot=(Show[##,PlotRange-> All]&)@@(tplots);*)
-(*(*Put the correct legend *)(Legended[#,delayscolored]&)@(*On this bunch of plots that have been overlaid *)Show[transitplot,FrameLabel->{{HoldForm[Subscript[Log, 10][\!\(\*SubsuperscriptBox[\(\[Delta]\), \(rel\), \(\[Mu]\)]\)]],None},{HoldForm[n],None}},PlotLabel->None,LabelStyle->{Directive[Black, Medium]}]*)
-
-
-(* ::Subsubsection:: *)
-(*Tail of SVD lost in truncation Vs Order of DMD model (n)*)
+(*dmddftdeviationplot = stdBWplot[crunchgrub[testdegs],splog10@ensembledat,basicolourlist,delayscolored,HoldForm[n],HoldForm[Subscript[Log, 10][\!\(\*SubsuperscriptBox[\(\[Delta]\), \(rel\), \(\[Mu]\)]\)]],{-17,1},Transparent]*)
 
 
 (* ::Input:: *)
-(*(Legended[#,delayscolored]&)@((Show[##,PlotRange-> All]&)@@(MapThread[BoxWhiskerChart[splog10[#1],ChartStyle->#2,ChartLabels-> crunchgrub[testdegs],ImageSize->Large,PlotRange->All,LabelStyle->Directive[Black, Medium]]&,{ensemblechoppeddat,basicolourlist}]))*)
+(*savetheseplots[{dmddftdeviationplot },nametheseplots[#,{"dmddftdeviation"}]&,"png"];*)
+
+
+(* ::Subsubsection:: *)
+(*Tail of SVD lost in truncation Vs n*)
+
+
+(* ::Input:: *)
+(*stdBWplot[crunchgrub[testdegs],splog10@ensemblechoppeddat,basicolourlist,delayscolored,HoldForm[n],HoldForm[Subscript[Log, 10][Subscript[\[Sigma], Tail]]],{-17,1},Transparent]*)
 
 
 (* ::Section:: *)
@@ -500,7 +485,7 @@
 (*AssociateTo[crunchgrub,{rmin-> Input["Please enter your guess of rmin ('hat{r}')"](* 7*),chosendeg->  Input["Please enter hat{n} to sample hat{r} from "]}];*)
 
 
-(* ::Subsubsection::Closed:: *)
+(* ::Subsubsection:: *)
 (*Pick data with sufficient delays and extract their common eigenvalues*)
 
 
@@ -514,7 +499,7 @@
 (*Clear[valswithgoodelays];*)
 
 
-(* ::Subsubsection::Closed:: *)
+(* ::Subsubsection:: *)
 (*Minutia*)
 
 
@@ -523,7 +508,7 @@
 (*ncases=4;*)
 
 
-(* ::Subsubsection::Closed:: *)
+(* ::Subsubsection:: *)
 (*Generate coordinates for heatmaps*)
 
 
@@ -562,11 +547,21 @@
 
 (* ::Input:: *)
 (*liftgrub[truevals] = estruevals;*)
-(*vals =ParallelMap[ms1shot4trajvariations[trajgrub,liftgrub,priorsgrub,testpriorsgrub,crunchgrub,#]&,{listoICs,listotseries,oldvals}\[Transpose]];*)
+(*(* We want the vertical line at the spot where we hit the number of eigenvalues used as the truth in the current analysis *)*)
+(*findnprojsintestdegs = (Flatten[Position[crunchgrub[testdegs],Length[liftgrub[truevals]]]])[[1]];*)
+(**)
+(*vals = ParallelMap[*)
+(*ms1shot4trajvariations[trajgrub, liftgrub, crunchgrub, #] &, *)
+(*{listotseries, listopnoise, oldvals}\[Transpose]*)
+(*];*)
 
 
 (* ::Input:: *)
-(*vals2plotopsVScases[vals,crunchcoords,ncases]*)
+(*estimateplots = kmdplots[crunchgrub[testdegs],ratequads,kmdQuality,vals,"KMD-Quality",basicolourlist,delayscolored]*)
+
+
+(* ::Input:: *)
+(*savetheseplots[estimateplots,nametheseplots[#,prefixstrlist["estimatevals_",plotgrub[casestrings]]]&,"png"];*)
 
 
 (* ::Subsubsection:: *)
@@ -574,7 +569,7 @@
 
 
 (* ::Input:: *)
-(*DumpSave[crunchgrub[savefile],{oldvals,vals,crunchgrub,trajgrub,liftgrub,priorsgrub,testpriorsgrub,basicolourlist,listoICs,plotgrub,simsteps,crunchcoords,ncases}];*)
+(*DumpSave[crunchgrub[savefile],{oldvals,vals,crunchgrub,trajgrub,liftgrub,basicolourlist,listoICs,plotgrub,simsteps,crunchcoords,ncases}];*)
 
 
 (* ::PageBreak:: *)
@@ -594,4 +589,6 @@
 (*(* Load the velocityfield data *)*)
 (*Get[trajgrub[prunedata]];*)
 (*(* Generate your trajectories *)*)
-(*listotseries = Map[((velocityfield[cavityPsi])[[All,Range[0,simsteps]+#]])\[Transpose](* Trasnpose coz the cavityPsi is in snapshot form *)&,listoICs];*)*)
+(*listotseries = Map[((velocityfield[cavityPsi])[[All,Range[0,simsteps]+#]])\[Transpose](* Trasnpose coz the cavityPsi is in snapshot form *)&,listoICs];*)
+(*listopnoise=Table[Transpose@getIIDnoise[{liftgrub[crows],simsteps+1},trajgrub[basicdist],trajgrub[covmat]],{i,nICs}];*)
+(**)*)

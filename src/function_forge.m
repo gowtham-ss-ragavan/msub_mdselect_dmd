@@ -285,7 +285,7 @@ overlaid*)Show[transitplot,
    ];
 
 kmdplots[allXlabels_, key_, fun_, vals_, funname_, colourlist_(**), 
-   colorlegend_(**)] := Module[{funnyvals, plots},
+   colorlegend_(**), vertbounds_, vertcolour_] := Module[{funnyvals, plots},
       (* Cases, Del, Deg, ICs *)
       funnyvals = Transpose[
           Map[
@@ -295,7 +295,14 @@ kmdplots[allXlabels_, key_, fun_, vals_, funname_, colourlist_(**),
           ];
       plots = 
         Map[stdBWplot[allXlabels, #, colourlist , colorlegend, "n", 
-              funname, {0, 1}, Hue[0.8]] &, funnyvals];
+              funname, vertbounds, vertcolour] &, funnyvals];
       plots
-      ];  
+      ]; 
+
+kmdplots[allXlabels_, key_, fun_, vals_, funname_, colourlist_(**), 
+   colorlegend_(**)] := 
+   kmdplots[allXlabels, key, fun, vals, funname, colourlist, 
+   colorlegend(**), {0,1}, Hue[0.8]];
+   
+
 

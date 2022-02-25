@@ -1,6 +1,6 @@
 (* ::Package:: *)
 
-(* ::Chapter:: *)
+(* ::Chapter::Closed:: *)
 (*Initialization*)
 
 
@@ -104,7 +104,7 @@ AssociateTo[trajgrub, discevals ->RandomReal[{0.8,1.2},7]*Exp[I*RandomReal[{-\[P
 (*trajgrub[discevals] = Join[RandomReal[{1,1},3]*Exp[I*RandomReal[{-\[Pi],\[Pi]},3]],RandomReal[{1,1},4]*Exp[I*RandomReal[{-\[Pi],\[Pi]},4]]];*)
 
 
-(* ::Subsubsection::Closed:: *)
+(* ::Subsubsection:: *)
 (*ssdim:= Dimension of the LTI = "r"*)
 
 
@@ -291,7 +291,7 @@ restols ->{10^-8,10^-12}(* greaterabsrelcheck *)}];
 (**)
 
 
-(* ::Subsubsection::Closed:: *)
+(* ::Subsubsection:: *)
 (*Parameters for cte2wt *)
 
 
@@ -333,7 +333,7 @@ trajgrub[covmat]= trajgrub[noiseSD]^2*IdentityMatrix[liftgrub[crows]];
 (*nICs = #[trajectories] to analyse*)
 
 
-nICs =20;
+nICs = 50;
 
 
 (* ::Subsubsection::Closed:: *)
@@ -387,7 +387,7 @@ basicolourlist = Array[Hue[#]&,Length@crunchgrub[testdelays],{0,0.7 (* The end o
 
 
 (* ::Input:: *)
-(*(*Get[crunchgrub[savefile]];*)*)
+(*Get[crunchgrub[savefile]];*)
 
 
 (* ::PageBreak:: *)
@@ -569,6 +569,8 @@ basicolourlist = Array[Hue[#]&,Length@crunchgrub[testdelays],{0,0.7 (* The end o
 
 (* ::Input:: *)
 (*liftgrub[truevals] = estruevals;*)
+(*(* We want the vertical line at the spot where we hit the number of eigenvalues used as the truth in the current analysis *)*)
+(*findnprojsintestdegs = (Flatten[Position[crunchgrub[testdegs],Length[liftgrub[truevals]]]])[[1]];*)
 (**)
 (*vals = ParallelMap[*)
 (*ms1shot4trajvariations[trajgrub, liftgrub, crunchgrub, #] &, *)
@@ -577,7 +579,7 @@ basicolourlist = Array[Hue[#]&,Length@crunchgrub[testdelays],{0,0.7 (* The end o
 
 
 (* ::Input:: *)
-(*estimateplots = kmdplots[crunchgrub[testdegs],ratequads,kmdQuality,vals,"KMDQuality",basicolourlist,delayscolored]*)
+(*estimateplots = kmdplots[crunchgrub[testdegs],ratequads,kmdQuality,vals,"KMD-Quality",basicolourlist,delayscolored]*)
 
 
 (* ::Input:: *)
@@ -590,6 +592,8 @@ basicolourlist = Array[Hue[#]&,Length@crunchgrub[testdelays],{0,0.7 (* The end o
 
 (* ::Input:: *)
 (*liftgrub[truevals] = N@trajgrub[discevals];*)
+(*(* Updating the vertical line for a different set of target eigenvalues *)*)
+(*findnprojsintestdegs = (Flatten[Position[crunchgrub[testdegs],Length[liftgrub[truevals]]]])[[1]];*)
 (**)
 (*valshonest =ParallelMap[*)
 (*ms1shot4trajvariations[trajgrub, liftgrub, crunchgrub, #] &, *)
@@ -598,7 +602,7 @@ basicolourlist = Array[Hue[#]&,Length@crunchgrub[testdelays],{0,0.7 (* The end o
 
 
 (* ::Input:: *)
-(*truthplots = kmdplots[crunchgrub[testdegs],ratequads,kmdQuality,valshonest,"KMDQuality",basicolourlist,delayscolored]*)
+(*truthplots = kmdplots[crunchgrub[testdegs],ratequads,kmdQuality,valshonest,"KMD-Quality",basicolourlist,delayscolored]*)
 
 
 (* ::Input:: *)

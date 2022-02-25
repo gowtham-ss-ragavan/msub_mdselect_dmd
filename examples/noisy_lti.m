@@ -329,7 +329,7 @@ trajgrub[covmat]= trajgrub[noiseSD]^2*IdentityMatrix[liftgrub[crows]];
 (*nICs = #[trajectories] to analyse*)
 
 
-nICs = 20;
+nICs = 50;
 
 
 (* ::Subsubsection::Closed:: *)
@@ -426,7 +426,7 @@ basicolourlist = Array[Hue[#]&,Length@crunchgrub[testdelays],{0,0.7 (* The end o
 
 
 (* ::Input:: *)
-(*tplots = kmdplots[crunchgrub[testdegs],ratequads,kmdQuality,vals,"KMDQuality",basicolourlist,delayscolored];*)
+(*tplots = kmdplots[crunchgrub[testdegs],ratequads,kmdQuality,vals,"KMD-Quality",basicolourlist,delayscolored];*)
 
 
 (* ::Input:: *)
@@ -452,7 +452,7 @@ basicolourlist = Array[Hue[#]&,Length@crunchgrub[testdelays],{0,0.7 (* The end o
 
 
 (* ::Input:: *)
-(*Block[{keep = {1,2,3,4},delayindex =-2},stdBWplot[crunchgrub[testdegs],kmdQuals[[keep,delayindex]],algocolours[[keep]],algoscoloured, "n","KMDQuality",{0,1},Hue[0.8]]]*)
+(*Block[{keep = {1,2,3,4},delayindex =-2},stdBWplot[crunchgrub[testdegs],kmdQuals[[keep,delayindex]],algocolours[[keep]],algoscoloured, "n","KMD-Quality",{0,1},Hue[0.8]]]*)
 
 
 (* ::Chapter::Closed:: *)
