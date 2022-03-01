@@ -4,7 +4,7 @@
 (*Initialization*)
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*Run scripts containing functions*)
 
 
@@ -15,19 +15,47 @@ Get[FileNameJoin[{DirectoryName[NotebookFileName[]], "makefile.m"}]];
 Get[FileNameJoin[{Nest[DirectoryName, NotebookFileName[],2],"src","function_forge.m"}] ];
 
 
+(* ::Subsubsection:: *)
+(*Choose the noisefree DS*)
+
+
+ltistring = "3";
+
+
+(* ::Subsubsection::Closed:: *)
+(*Load,write and clear*)
+
+
+(* ::Input:: *)
+(*loadfilename = StringJoin["lti","_",ltistring];*)
+(*Get[loadfilename];*)
+(*noiselessLTIevals = liftgrub[truevals];*)
+(*Clear[vals,basicolourlist,listoICs,listotseries];*)
+
+
 (* ::Subsubsection::Closed:: *)
 (*Setup Associations (structs in Common) to collect input parameters*)
 
 
-{trajgrub,liftgrub,crunchgrub,plotgrub} = Table[<||>,{i,4}];
+(* ::Input:: *)
+(*{trajgrub,liftgrub,crunchgrub,plotgrub} = Table[<||>,{i,4}];*)
+
+
+(* ::Subsubsection::Closed:: *)
+(*Set LTI case*)
+
+
+(* ::Input:: *)
+(*crunchgrub[lticase] = ltistring;*)
 
 
 (* ::Subsubsection::Closed:: *)
 (*Generate savefile name*)
 
 
-AssociateTo[crunchgrub,savefile ->FileBaseName[NotebookFileName[]](* Name savefile after notebook *) ];
-crunchgrub[plotdir] = FileNameJoin[{FileNameJoin[Drop[FileNameSplit[NotebookFileName[]],-2]],"plots"}];
+(* ::Input:: *)
+(*AssociateTo[crunchgrub,savefile ->StringJoin[FileBaseName[NotebookFileName[]],"_",crunchgrub[lticase]](* Name savefile after notebook + Case number of LTI system  *) ];*)
+(*crunchgrub[plotdir] = FileNameJoin[{FileNameJoin[Drop[FileNameSplit[NotebookFileName[]],-2]],"plots"}];*)
 
 
 (* ::Chapter:: *)
@@ -50,7 +78,7 @@ crunchgrub[plotdir] = FileNameJoin[{FileNameJoin[Drop[FileNameSplit[NotebookFile
 (*DMD model order (n) : minn \[LongRightArrow] maxn*)
 
 
-AssociateTo[plotgrub,{testdelays -> Range[0,25](*Range[6,25]*)(*{6,25,50,100,200,400}*), testdegs-> Range[2,25]}];
+AssociateTo[plotgrub,{testdelays -> {0,3,6,25,50,100,200,400}(*Range[0,28]*)(*Range[6,25]*)(*Join[Range[0,60],{70,80,90,100,200,400}]*), testdegs-> Range[2,25]}];
 
 
 (* ::Subsubsection::Closed:: *)
@@ -62,7 +90,7 @@ crunchgrub[maxdelays] = Max@ crunchgrub[testdelays];
 
 
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*DS specs*)
 
 
@@ -90,14 +118,12 @@ crunchgrub[maxdelays] = Max@ crunchgrub[testdelays];
 (*VDP : x1'=x2,x2'=\epsilon(1-x1^2)x2-x1 .*)
 
 
-(*AssociateTo[trajgrub, discevals ->RandomReal[{0.8,1.2},7]*Exp[I*RandomReal[{-\[Pi],\[Pi]},7]]  (*Exp[I*(2\[Pi])/7*Range[0,6]]*)(**Exp[\[ImaginaryI]*(2\[Pi])/14] *)]; *)
+(* ::Input:: *)
+(*trajgrub[discevals] = noiselessLTIevals;*)
 
 
-(* ::Text:: *)
-(*UnitDisc + UnitCircle*)
-
-
-trajgrub[discevals] = Join[RandomReal[{1,1},3]*Exp[I*RandomReal[{-\[Pi],\[Pi]},3]],RandomReal[{1,1},4]*Exp[I*RandomReal[{-\[Pi],\[Pi]},4]]];
+(* ::Input:: *)
+(*Remove[ltistring, loadfilename, noiselessLTIevals];*)
 
 
 (* ::Subsubsection::Closed:: *)
@@ -107,7 +133,7 @@ trajgrub[discevals] = Join[RandomReal[{1,1},3]*Exp[I*RandomReal[{-\[Pi],\[Pi]},3
 ssdim = Length@trajgrub[discevals];
 
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*Dictionary specs*)
 
 
@@ -140,7 +166,7 @@ AssociateTo[liftgrub,{cmatseed-> {},crank ->(*ssdim *)1, crows -> 1 (**)  , npro
 crunchgrub[meff] = 2*ssdim;
 
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*Sampling time*)
 
 
@@ -181,7 +207,7 @@ contevals = 1/trajgrub[tsamp]*Log[trajgrub[discevals]];
 generatingAmat = eval2amat[contevals];
 
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*Mean subtraction data*)
 
 
@@ -229,7 +255,7 @@ AssociateTo[liftgrub,{rate2sub -> 1,nfunda-> (* Case 2 always *) 2*trajgrub[maxn
 AssociateTo[liftgrub,truevals-> trajgrub[discevals](* {} if you don't know what it should be, in which case we don't know what mean subtraction does *)]; 
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*Choice of DS*)
 
 
@@ -257,7 +283,7 @@ AssociateTo[trajgrub,vfield ->  locallti];
 AssociateTo[trajgrub, chosenputty -> (#&) ];
 
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*Tolerances *)
 
 
@@ -306,12 +332,12 @@ restols ->{10^-8,10^-12}(* greaterabsrelcheck *)}];
 AssociateTo[crunchgrub,{cpow-> 1,tepow-> 1}];
 
 
-(* ::Subsubsection:: *)
+(* ::Subsection:: *)
 (*Noise parameters:*)
 
 
 trajgrub[basicdist] = UniformDistribution[{-Sqrt[3],Sqrt[3]}] (*1*); (* Zero mean and SD = 1 *)
-trajgrub[noiseSD]= 5;
+trajgrub[noiseSD]= 25;
 
 
 trajgrub[covmat]= trajgrub[noiseSD]^2*IdentityMatrix[liftgrub[crows]];
@@ -321,7 +347,7 @@ trajgrub[covmat]= trajgrub[noiseSD]^2*IdentityMatrix[liftgrub[crows]];
 (**)
 
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*#[realizations] to analyse*)
 
 
@@ -389,7 +415,7 @@ basicolourlist = Array[Hue[#]&,Length@crunchgrub[testdelays],{0,0.7 (* The end o
 (**)
 
 
-(* ::Chapter:: *)
+(* ::Chapter::Closed:: *)
 (*Post-processing*)
 
 
@@ -433,13 +459,16 @@ basicolourlist = Array[Hue[#]&,Length@crunchgrub[testdelays],{0,0.7 (* The end o
 (*savetheseplots[tplots,nametheseplots[#,prefixstrlist["KMDQuality_",plotgrub[casestrings]]]&,"png"];*)
 
 
+tplots
+
+
 (* ::Subsection:: *)
 (*Best delay for all cases*)
 
 
 (* ::Input:: *)
 (*algocolours = {Green, Red, Cyan, Blue};*)
-(*algoscoloured = LineLegend[algocolours, {"Companion", "Noisy Companion", "TLS", "Noise-resist Companion"}];*)
+(*algoscoloured = SwatchLegend[algocolours, {"Companion", "Noisy Companion", "TLS", "Noise-resist Companion"},LabelStyle->Directive[Black,15]];*)
 
 
 (* ::Input:: *)
@@ -452,7 +481,12 @@ basicolourlist = Array[Hue[#]&,Length@crunchgrub[testdelays],{0,0.7 (* The end o
 
 
 (* ::Input:: *)
-(*Block[{keep = {1,2,3,4},delayindex =-2},stdBWplot[crunchgrub[testdegs],kmdQuals[[keep,delayindex]],algocolours[[keep]],algoscoloured, "n","KMD-Quality",{0,1},Hue[0.8]]]*)
+(*nicedelayplot = Block[{keep = {1,2,3,4},delayindex =-1,localplot,plotgivename},localplot =stdBWplot[crunchgrub[testdegs],kmdQuals[[keep,delayindex]],algocolours[[keep]],algoscoloured, "n","KMD-Quality",{0,1},Hue[0.8],{{0.98,0.06},{1,0}}];*)
+(*plotgivename = StringJoin["KMDQuality_",ToString[(crunchgrub[testdelays])[[delayindex]]],"_delays"];*)
+(*savetheseplots[{localplot},nametheseplots[#,{plotgivename}]&,"png"];*)
+(*localplot*)
+(*]*)
+(**)
 
 
 (* ::Chapter::Closed:: *)

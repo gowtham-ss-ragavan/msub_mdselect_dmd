@@ -65,7 +65,7 @@ getetvdepwrtcdeg[vals_, cgrubin_] := Module[{cgrub = cgrubin, localetvs, pairdts
    plotcoords = Flatten[Outer[{##} &, cgrubin[testdegs], cgrubin[testdegs]], 1];
    (*Assuming the first coordinate represents the first argument,we zero out all those with a larger first argument,AFTER taking a log10*)
    zcoords = Flatten@UpperTriangularize@splog10[pairdts];
-   ldplot[plotcoords, zcoords, {"Bigger n", "Smaller n"}, {(*Skip the diagonals*)-12, -0.01 (*Skip the zeros*)}, "TemperatureMap"(* A more vivid color scheme than the default*)]
+   ldplot[plotcoords, zcoords, {"Test n ", "Candidate n"}, {(*Skip the diagonals*)-12, -0.01 (*Skip the zeros*)}, "TemperatureMap"(* A more vivid color scheme than the default*)]
    ];
 
 
@@ -312,7 +312,7 @@ ldpin=getxyzlist[xycoords,zcoords];
 {xrange,yrange} = Map[MinMax,xycoords\[Transpose]];
 regfun= Function[{x,y,z},xrange[[1]] <= x <= xrange[[2]] && yrange[[1]] <= y <= yrange[[2]]];
 (* Combine all options in the plot*)
-ListDensityPlot[ldpin,InterpolationOrder->0,PlotLegends->Automatic,FrameLabel->framelabel,PlotRange->plotrange,PerformanceGoal->"Quality",LabelStyle->Directive[Black,15],RegionFunction->regfun,ColorFunction->colourfun]
+ListDensityPlot[ldpin,InterpolationOrder->0,PlotLegends->Automatic,FrameLabel->framelabel,PlotRange->plotrange,PerformanceGoal->"Quality",LabelStyle->Directive[Black,20],RegionFunction->regfun,ColorFunction->colourfun]
 ];
 
 

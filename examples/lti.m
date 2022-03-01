@@ -1,6 +1,6 @@
 (* ::Package:: *)
 
-(* ::Chapter::Closed:: *)
+(* ::Chapter:: *)
 (*Initialization*)
 
 
@@ -22,12 +22,20 @@ Get[FileNameJoin[{Nest[DirectoryName, NotebookFileName[],2],"src","function_forg
 {trajgrub,liftgrub,crunchgrub,plotgrub} = Table[<||>,{i,4}];
 
 
+(* ::Subsubsection:: *)
+(*Set LTI case*)
+
+
+crunchgrub[lticase] = "3";
+
+
 (* ::Subsubsection::Closed:: *)
 (*Generate savefile name*)
 
 
-AssociateTo[crunchgrub,savefile ->FileBaseName[NotebookFileName[]](* Name savefile after notebook *) ];
-crunchgrub[plotdir] = FileNameJoin[{FileNameJoin[Drop[FileNameSplit[NotebookFileName[]],-2]],"plots"}];
+(* ::Input:: *)
+(*AssociateTo[crunchgrub,savefile ->StringJoin[FileBaseName[NotebookFileName[]],"_",crunchgrub[lticase]](* Name savefile after notebook + Case number of LTI system  *) ];*)
+(*crunchgrub[plotdir] = FileNameJoin[{FileNameJoin[Drop[FileNameSplit[NotebookFileName[]],-2]],"plots"}];*)
 
 
 (* ::Chapter:: *)
@@ -38,7 +46,7 @@ crunchgrub[plotdir] = FileNameJoin[{FileNameJoin[Drop[FileNameSplit[NotebookFile
 (*Temporal parameters*)
 
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*Define the scope of study*)
 
 
@@ -50,7 +58,7 @@ crunchgrub[plotdir] = FileNameJoin[{FileNameJoin[Drop[FileNameSplit[NotebookFile
 (*DMD model order (n) : minn \[LongRightArrow] maxn*)
 
 
-AssociateTo[plotgrub,{testdelays -> Range[0,25](*{6,25,50,100,200,400}*), testdegs-> Range[2,25]}];
+AssociateTo[plotgrub,{testdelays -> Range[0,28](*{6,25,50,100,200,400}*), testdegs-> Range[2,25]}];
 
 
 (* ::Subsubsection::Closed:: *)
@@ -62,7 +70,7 @@ crunchgrub[maxdelays] = Max@ crunchgrub[testdelays];
 
 
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*DS specs*)
 
 
@@ -90,28 +98,27 @@ crunchgrub[maxdelays] = Max@ crunchgrub[testdelays];
 (*VDP : x1'=x2,x2'=\epsilon(1-x1^2)x2-x1 .*)
 
 
-AssociateTo[trajgrub, discevals ->RandomReal[{0.8,1.2},7]*Exp[I*RandomReal[{-\[Pi],\[Pi]},7]]  (*Exp[I*(2\[Pi])/7*Range[0,6]]*)(**Exp[\[ImaginaryI]*(2\[Pi])/14] *)]; 
-
-
 (* ::Input:: *)
 (*plotgrub[casestrings] = {"vanilla","ms","mspres","msdel"};*)
 
 
-(* ::Text:: *)
-(*UnitDisc + UnitCircle*)
+(* ::Input:: *)
+(*trajgrub[discevals] = Switch[crunchgrub[lticase],*)
+(*"1a", Exp[I*(2\[Pi])/7*Range[0,6]],*)
+(*"1b",RandomReal[{1,1},7]*Exp[I*RandomReal[{-\[Pi],\[Pi]},7]],*)
+(*"2",RandomReal[{0.8,1.2},7]*Exp[I*RandomReal[{-\[Pi],\[Pi]},7]],*)
+(*"3",Join[RandomReal[{0.8,1},3]*Exp[I*RandomReal[{-\[Pi],\[Pi]},3]],RandomReal[{1,1},4]*Exp[I*RandomReal[{-\[Pi],\[Pi]},4]]]*)
+(*];*)
 
 
-(*trajgrub[discevals] = Join[RandomReal[{1,1},3]*Exp[I*RandomReal[{-\[Pi],\[Pi]},3]],RandomReal[{1,1},4]*Exp[I*RandomReal[{-\[Pi],\[Pi]},4]]];*)
-
-
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*ssdim:= Dimension of the LTI = "r"*)
 
 
 ssdim = Length@trajgrub[discevals];
 
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*Dictionary specs*)
 
 
@@ -144,7 +151,7 @@ AssociateTo[liftgrub,{cmatseed-> {},crank ->(*ssdim *)1, crows -> 1 (**)  , npro
 crunchgrub[meff] = 2*ssdim;
 
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*Sampling time*)
 
 
@@ -233,7 +240,7 @@ AssociateTo[liftgrub,{rate2sub -> 1,nfunda-> (* Case 2 always *) 2*trajgrub[maxn
 AssociateTo[liftgrub,truevals-> trajgrub[discevals](* {} if you don't know what it should be, in which case we don't know what mean subtraction does *)]; 
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*Choice of DS*)
 
 
@@ -261,7 +268,7 @@ AssociateTo[trajgrub,vfield ->  locallti];
 AssociateTo[trajgrub, chosenputty -> (#&) ];
 
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*Tolerances *)
 
 
@@ -291,7 +298,7 @@ restols ->{10^-8,10^-12}(* greaterabsrelcheck *)}];
 (**)
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*Parameters for cte2wt *)
 
 
@@ -310,7 +317,7 @@ restols ->{10^-8,10^-12}(* greaterabsrelcheck *)}];
 AssociateTo[crunchgrub,{cpow-> 1,tepow-> 1}];
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*Noise parameters:*)
 
 
@@ -325,7 +332,7 @@ trajgrub[covmat]= trajgrub[noiseSD]^2*IdentityMatrix[liftgrub[crows]];
 (**)
 
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*#[realizations] to analyse*)
 
 
@@ -398,7 +405,7 @@ basicolourlist = Array[Hue[#]&,Length@crunchgrub[testdelays],{0,0.7 (* The end o
 (*Post-processing*)
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*Plot travails*)
 
 
@@ -426,7 +433,7 @@ basicolourlist = Array[Hue[#]&,Length@crunchgrub[testdelays],{0,0.7 (* The end o
 (*DMD-DFT transition*)
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*Parse data into a matrix form*)
 
 
@@ -484,7 +491,11 @@ basicolourlist = Array[Hue[#]&,Length@crunchgrub[testdelays],{0,0.7 (* The end o
 
 
 (* ::Input:: *)
-(*getetvdepwrtcdeg[vals,crunchgrub]*)
+(*howtochooseyourrplot =getetvdepwrtcdeg[vals,crunchgrub]*)
+
+
+(* ::Input:: *)
+(*savetheseplots[{howtochooseyourrplot},nametheseplots[#,{"rpyramid"}]&,"png"];*)
 
 
 (* ::Subsection:: *)
@@ -621,7 +632,7 @@ basicolourlist = Array[Hue[#]&,Length@crunchgrub[testdelays],{0,0.7 (* The end o
 (**)
 
 
-(* ::Chapter::Closed:: *)
+(* ::Chapter:: *)
 (*Restore-point #2*)
 
 
@@ -631,3 +642,14 @@ basicolourlist = Array[Hue[#]&,Length@crunchgrub[testdelays],{0,0.7 (* The end o
 
 (* ::Input:: *)
 (*(*Get[crunchgrub[savefile]];*)*)
+
+
+Map[Sort[Abs[#]]&,{liftgrub[truevals],estruevals}]
+
+
+(* ::Text:: *)
+(*Case 3: {{0.843196, 0.900726, 0.908183, 1., 1., 1., 1.}, {0.843206, 0.900726, 0.908182, 1., 1., 1., 1.}}*)
+
+
+(* ::Text:: *)
+(*Case "2": {{0.804115, 0.917215, 0.988516, 1.11844, 1.1256, 1.15137, 1.18063}, {1.11844, 1.1256, 1.15137, 1.18064}}*)

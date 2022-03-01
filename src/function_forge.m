@@ -272,17 +272,24 @@ fonts *)
    ];
 
 stdBWplot[allXlabels_, ensembledat_, colourlist_, colorlegend_, 
-   xlabel_, ylabel_, vertbounds_, vertcolour_] := 
-  Module[{transitplot},
-   transitplot = 
-    basicBWplot[allXlabels, ensembledat, colourlist, vertbounds, 
-     vertcolour];
-   (*Put the correct legend*)(Legended[#, 
-       colorlegend] &)@(*On this bunch of plots that have been \
-overlaid*)Show[transitplot, 
-     FrameLabel -> {{ylabel, None}, {xlabel, None}}, 
-     PlotLabel -> None, LabelStyle -> {Directive[Black, 20]}]
-   ];
+      xlabel_, ylabel_, vertbounds_, vertcolour_, placement_] :=
+    Module[ {transitplot},
+        transitplot = 
+          basicBWplot[allXlabels, ensembledat, colourlist, vertbounds, 
+            vertcolour];
+        (*Put the correct legend*)
+        (Legended[#, 
+        Placed[colorlegend, (* Nice delay plots are better displayed if the legend were within the SE corner *)
+        placement]] &)@(*On this bunch of plots that have been \
+        overlaid*)Show[transitplot, 
+        FrameLabel -> {{ylabel, None}, {xlabel, None}}, 
+        PlotLabel -> None, LabelStyle -> {Directive[Black, 20]}]
+    ];
+   
+stdBWplot[allXlabels_, ensembledat_, colourlist_, colorlegend_, 
+      xlabel_, ylabel_, vertbounds_, vertcolour_] :=
+    stdBWplot[allXlabels, ensembledat, colourlist, colorlegend, 
+        xlabel, ylabel, vertbounds, vertcolour, After];
 
 kmdplots[allXlabels_, key_, fun_, vals_, funname_, colourlist_(**), 
    colorlegend_(**), vertbounds_, vertcolour_] := Module[{funnyvals, plots},

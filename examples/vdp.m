@@ -50,7 +50,7 @@ crunchgrub[plotdir] = FileNameJoin[{FileNameJoin[Drop[FileNameSplit[NotebookFile
 (*DMD model order (n) : minn \[LongRightArrow] maxn*)
 
 
-AssociateTo[plotgrub,{testdelays -> Range[0,25](*{6,25,50,100,200,400}*), testdegs-> Range[2,25]}];
+AssociateTo[plotgrub,{testdelays -> Range[0,28](*{6,25,50,100,200,400}*), testdegs-> Range[2,25]}];
 
 
 (* ::Subsubsection::Closed:: *)
@@ -62,7 +62,7 @@ crunchgrub[maxdelays] = Max@ crunchgrub[testdelays];
 
 
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*DS specs*)
 
 
@@ -140,7 +140,7 @@ AssociateTo[liftgrub,{cmatseed-> {},crank ->(*ssdim *)1, crows -> 1 (**)  , npro
 crunchgrub[meff] = 2*ssdim;
 
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*Sampling time*)
 
 
@@ -160,7 +160,7 @@ crunchgrub[meff] = 2*ssdim;
 (*AssociateTo[trajgrub,{tinit -> 0, tsamp -> 1}];*)
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*Generate integrating parameters*)
 
 
@@ -174,7 +174,7 @@ tfinn = trajgrub[tinit] + trajgrub[tsamp]*simsteps;
 sampackage = {trajgrub[tinit],trajgrub[tsamp],simsteps-1};
 
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*Mean subtraction data*)
 
 
@@ -252,7 +252,7 @@ sampackage = {trajgrub[tinit],trajgrub[tsamp],simsteps-1};
 (*AssociateTo[trajgrub, chosenputty -> (#&) ];*)
 
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*Tolerances *)
 
 
@@ -301,7 +301,7 @@ restols ->{10^-8,10^-12}(* greaterabsrelcheck *)}];
 AssociateTo[crunchgrub,{cpow-> 1,tepow-> 1}];
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*Noise parameters:*)
 
 
@@ -324,8 +324,7 @@ trajgrub[covmat]= trajgrub[noiseSD]^2*IdentityMatrix[liftgrub[crows]];
 (*nICs = #[trajectories] to analyse*)
 
 
-(* ::Input:: *)
-(*nICs = 50;*)
+nICs = 50;
 
 
 (* ::Subsubsection::Closed:: *)
@@ -336,7 +335,7 @@ trajgrub[covmat]= trajgrub[noiseSD]^2*IdentityMatrix[liftgrub[crows]];
 (*getic[ssdim_,nprojs_]:=RandomSample[PadRight[RandomReal[{-5,5},nprojs],ssdim]];*)
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*Generate a list of trajectories*)
 
 
@@ -347,7 +346,7 @@ listotseries = Map[getimeseries[#,trajgrub[vfield],trajgrub[tinit],tfinn,sampack
 listopnoise=Table[Transpose@getIIDnoise[{liftgrub[crows],simsteps+1},trajgrub[basicdist],trajgrub[covmat]],{i,nICs}];
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*Initialize colour-scheme for plots*)
 
 
@@ -390,11 +389,11 @@ basicolourlist = Array[Hue[#]&,Length@crunchgrub[testdelays],{0,0.7 (* The end o
 (*(*Get[crunchgrub[savefile]];*)*)
 
 
-(* ::Chapter:: *)
+(* ::Chapter::Closed:: *)
 (*Post-processing*)
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*Plot travails*)
 
 

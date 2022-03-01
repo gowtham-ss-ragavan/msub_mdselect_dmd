@@ -1,10 +1,10 @@
 (* ::Package:: *)
 
-(* ::Chapter::Closed:: *)
+(* ::Chapter:: *)
 (*Initialization*)
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*Run scripts containing functions*)
 
 
@@ -15,7 +15,7 @@ Get[FileNameJoin[{DirectoryName[NotebookFileName[]], "makefile.m"}]];
 Get[FileNameJoin[{Nest[DirectoryName, NotebookFileName[],2],"src","function_forge.m"}] ];
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*Setup Associations (structs in Common) to collect input parameters*)
 
 
@@ -30,16 +30,15 @@ Get[FileNameJoin[{Nest[DirectoryName, NotebookFileName[],2],"src","function_forg
 (*Valid options : 13k, 16k, 20k, 30k*)
 
 
-(* ::Input:: *)
-(*AssociateTo[trajgrub, vfield-> "20k"]; *)
+AssociateTo[trajgrub, vfield -> "30k"]; 
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*Generate savefile name*)
 
 
 (* ::Input:: *)
-(*AssociateTo[crunchgrub, savefile -> StringJoin[{FileBaseName[NotebookFileName[]] , "_vals_", trajgrub[vfield]}]];*)
+(*AssociateTo[crunchgrub, savefile -> StringJoin[{FileBaseName[NotebookFileName[]] , "_", trajgrub[vfield]}]];*)
 (**)
 (*crunchgrub[plotdir] = FileNameJoin[{FileNameJoin[Drop[FileNameSplit[NotebookFileName[]],-2]],"plots"}];*)
 
@@ -48,11 +47,11 @@ Get[FileNameJoin[{Nest[DirectoryName, NotebookFileName[],2],"src","function_forg
 (*Computations*)
 
 
-(* ::Section::Closed:: *)
+(* ::Section:: *)
 (*Temporal parameters*)
 
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*Define the scope of study*)
 
 
@@ -64,7 +63,7 @@ Get[FileNameJoin[{Nest[DirectoryName, NotebookFileName[],2],"src","function_forg
 (*DMD model order (n) : minn \[LongRightArrow] maxn*)
 
 
-AssociateTo[plotgrub,{testdelays -> Range[0,25](*{6,25,50,100,200,400}*), testdegs-> Range[2,25]}];
+AssociateTo[plotgrub,{testdelays -> Range[0,28](*{6,25,50,100,200,400}*), testdegs-> Range[2,25]}];
 
 
 (* ::Subsubsection:: *)
@@ -76,7 +75,7 @@ crunchgrub[maxdelays] = Max@ crunchgrub[testdelays];
 
 
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*DS specs*)
 
 
@@ -84,7 +83,7 @@ crunchgrub[maxdelays] = Max@ crunchgrub[testdelays];
 (*AssociateTo[trajgrub, chosenputty -> (#&) ];*)
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*Get addresses and load the cavity data*)
 
 
@@ -105,7 +104,7 @@ crunchgrub[maxdelays] = Max@ crunchgrub[testdelays];
 (*plotgrub[casestrings] = {"vanilla","ms","mspres","msdel"};*)
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*ssdim:= #[grid-points] that sample*)
 
 
@@ -113,7 +112,7 @@ crunchgrub[maxdelays] = Max@ crunchgrub[testdelays];
 (*{ssdim,rawsnapcount}=Dimensions[velocityfield[cavityPsi]];*)
 
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*Dictionary specs*)
 
 
@@ -146,7 +145,7 @@ AssociateTo[liftgrub,{cmatseed-> {},crank ->(*ssdim *)1, crows -> 1 (**)  , npro
 crunchgrub[meff] = 2*ssdim;
 
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*Sampling time*)
 
 
@@ -166,7 +165,7 @@ crunchgrub[meff] = 2*ssdim;
 (*AssociateTo[trajgrub,{tinit -> 0, tsamp -> 0.05}];*)
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*Generate integrating parameters*)
 
 
@@ -176,7 +175,7 @@ AssociateTo[trajgrub,{maxdelays ->  Max@crunchgrub[testdelays], maxn-> Max@crunc
 simsteps=2*trajgrub[maxdelays]+trajgrub[maxn]+1+crunchgrub[meff];
 
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*Mean subtraction data*)
 
 
@@ -224,7 +223,7 @@ simsteps=2*trajgrub[maxdelays]+trajgrub[maxn]+1+crunchgrub[meff];
 (*AssociateTo[liftgrub,{rate2sub -> 1,nfunda-> (* Case 2 always *) 2*trajgrub[maxn] (* Impute the number you've rigged the system to have *)(*6*)(* 13*)}];*)
 
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*Tolerances *)
 
 
@@ -255,7 +254,7 @@ simsteps=2*trajgrub[maxdelays]+trajgrub[maxn]+1+crunchgrub[meff];
 (*(**)*)
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*Parameters for cte2wt *)
 
 
@@ -275,7 +274,7 @@ simsteps=2*trajgrub[maxdelays]+trajgrub[maxn]+1+crunchgrub[meff];
 (*AssociateTo[crunchgrub,{cpow-> 1,tepow-> 1}];*)
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*Noise parameters:*)
 
 
@@ -321,7 +320,8 @@ trajgrub[covmat]= trajgrub[noiseSD]^2*IdentityMatrix[liftgrub[crows]];
 (*listotseries = Map[((velocityfield[cavityPsi])[[All,Range[0,simsteps]+#]])\[Transpose](* Transpose coz the cavityPsi is in snapshot form *)&,listoICs];*)
 
 
-listopnoise=Table[Transpose@getIIDnoise[{liftgrub[crows],simsteps+1},trajgrub[basicdist],trajgrub[covmat]],{i,nICs}];
+(* ::Input:: *)
+(*listopnoise=Table[Transpose@getIIDnoise[{liftgrub[crows],simsteps+1},trajgrub[basicdist],trajgrub[covmat]],{i,nICs}];*)
 
 
 (* ::Subsubsection:: *)
@@ -373,6 +373,7 @@ listopnoise=Table[Transpose@getIIDnoise[{liftgrub[crows],simsteps+1},trajgrub[ba
 (*(* Load the velocityfield data *)*)
 (*Get[trajgrub[prunedata]];*)
 (*(* Generate your trajectories *)*)
+(*nICs = Length[listoICs];*)
 (*listotseries = Map[((velocityfield[cavityPsi])[[All,Range[0,simsteps]+#]])\[Transpose](* Trasnpose coz the cavityPsi is in snapshot form *)&,listoICs];*)
 (*listopnoise=Table[Transpose@getIIDnoise[{liftgrub[crows],simsteps+1},trajgrub[basicdist],trajgrub[covmat]],{i,nICs}];*)
 (*(* UNdo all changes *)*)
@@ -384,7 +385,7 @@ listopnoise=Table[Transpose@getIIDnoise[{liftgrub[crows],simsteps+1},trajgrub[ba
 (*Post-processing*)
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*Plot travails*)
 
 
@@ -470,7 +471,10 @@ listopnoise=Table[Transpose@getIIDnoise[{liftgrub[crows],simsteps+1},trajgrub[ba
 
 
 (* ::Input:: *)
-(*getetvdepwrtcdeg[vals,crunchgrub]*)
+(*howtochooseyourrplot =getetvdepwrtcdeg[vals,crunchgrub]*)
+
+
+savetheseplots[{howtochooseyourrplot},nametheseplots[#,{"rpyramid"}]&,"png"];
 
 
 (* ::Subsection:: *)
@@ -592,3 +596,18 @@ listopnoise=Table[Transpose@getIIDnoise[{liftgrub[crows],simsteps+1},trajgrub[ba
 (*listotseries = Map[((velocityfield[cavityPsi])[[All,Range[0,simsteps]+#]])\[Transpose](* Trasnpose coz the cavityPsi is in snapshot form *)&,listoICs];*)
 (*listopnoise=Table[Transpose@getIIDnoise[{liftgrub[crows],simsteps+1},trajgrub[basicdist],trajgrub[covmat]],{i,nICs}];*)
 (**)*)
+
+
+Sort[Abs[estruevals]]
+
+
+(* ::Text:: *)
+(*20k: {0.999255, 1.06807}*)
+
+
+(* ::Text:: *)
+(*16k:  {0.994866, 0.997453}*)
+
+
+(* ::Text:: *)
+(*13k: {0.965107, 0.965107, 0.991791, 0.991791, 0.999884}*)
