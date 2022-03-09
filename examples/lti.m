@@ -46,7 +46,7 @@ crunchgrub[lticase] = "3";
 (*Temporal parameters*)
 
 
-(* ::Subsection::Closed:: *)
+(* ::Subsection:: *)
 (*Define the scope of study*)
 
 
@@ -58,7 +58,7 @@ crunchgrub[lticase] = "3";
 (*DMD model order (n) : minn \[LongRightArrow] maxn*)
 
 
-AssociateTo[plotgrub,{testdelays -> Range[0,28](*{6,25,50,100,200,400}*), testdegs-> Range[2,25]}];
+AssociateTo[plotgrub,{testdelays -> (*Join[{0,3,5,6},{13,20,27}]*)Range[0,28], testdegs-> Range[2,25]}];
 
 
 (* ::Subsubsection::Closed:: *)
@@ -99,7 +99,7 @@ crunchgrub[maxdelays] = Max@ crunchgrub[testdelays];
 
 
 (* ::Input:: *)
-(*plotgrub[casestrings] = {"vanilla","ms","mspres","msdel"};*)
+(*plotgrub[casestrings] = {"vanilla","ms","truesansrate","truewithrate"};*)
 
 
 (* ::Input:: *)
@@ -236,7 +236,7 @@ generatingAmat = eval2amat[contevals];
 (*Others: {}*)
 
 
-AssociateTo[liftgrub,{rate2sub -> 1,nfunda-> (* Case 2 always *) 2*trajgrub[maxn] (* Impute the number you've rigged the system to have *)(*6*)(* 13*)}];
+AssociateTo[liftgrub,{rate2sub -> 1,nfunda-> 2*trajgrub[maxn](* Irrelevant at this point: Just a dummy variable until there is time for a cleanup*)}];
 AssociateTo[liftgrub,truevals-> trajgrub[discevals](* {} if you don't know what it should be, in which case we don't know what mean subtraction does *)]; 
 
 
@@ -332,7 +332,7 @@ trajgrub[covmat]= trajgrub[noiseSD]^2*IdentityMatrix[liftgrub[crows]];
 (**)
 
 
-(* ::Subsection::Closed:: *)
+(* ::Subsection:: *)
 (*#[realizations] to analyse*)
 
 
@@ -394,7 +394,7 @@ basicolourlist = Array[Hue[#]&,Length@crunchgrub[testdelays],{0,0.7 (* The end o
 
 
 (* ::Input:: *)
-(*Get[crunchgrub[savefile]];*)
+(*(*Get[crunchgrub[savefile]];*)*)
 
 
 (* ::PageBreak:: *)
@@ -478,69 +478,6 @@ basicolourlist = Array[Hue[#]&,Length@crunchgrub[testdelays],{0,0.7 (* The end o
 (*stdBWplot[crunchgrub[testdegs],splog10@ensemblechoppeddat,basicolourlist,delayscolored,HoldForm[n],HoldForm[Subscript[Log, 10][Subscript[\[Sigma], Tail]]],{-17,1},Hue[0.8]]*)
 
 
-(* ::Section:: *)
-(*Eigenvalues from multiple time traces : Algorithm 6.1*)
-
-
-(* ::Subsection:: *)
-(*Determining rmin*)
-
-
-(* ::Subsubsection:: *)
-(*Log10[How well is the y-th estimate contained in the x-th estimate] *)
-
-
-(* ::Input:: *)
-(*howtochooseyourrplot =getetvdepwrtcdeg[vals,crunchgrub]*)
-
-
-(* ::Input:: *)
-(*savetheseplots[{howtochooseyourrplot},nametheseplots[#,{"rpyramid"}]&,"png"];*)
-
-
-(* ::Subsection:: *)
-(*Choose  rmin from the earlier diagnostics*)
-
-
-(* ::Item:: *)
-(*Highest y-coordinate, within \hat{r}_{min}: \hat{r}_{max}, with a row of low values*)
-
-
-(* ::Input:: *)
-(*AssociateTo[crunchgrub,{rmin-> Input["Please enter your guess of rmin ('hat{r}')"](* 7*),chosendeg->  Input["Please enter hat{n} to sample hat{r} from "]}];*)
-
-
-(* ::Subsubsection:: *)
-(*Pick data with sufficient delays and extract their common eigenvalues*)
-
-
-(* ::Input:: *)
-(*AssociateTo[crunchgrub,{delaymin-> crunchgrub[chosendeg]-1}];*)
-(*valswithgoodelays=keepthemgoodelays[onlythequads[vals],crunchgrub];*)
-
-
-(* ::Input:: *)
-(*{prunedrootqfs,estruevals}=sneakyestimatetruevals[valswithgoodelays,crunchgrub,"verbose"];*)
-(*Clear[valswithgoodelays];*)
-
-
-(* ::Subsubsection:: *)
-(*Hausdorff distance between estimated and true eigenvalues*)
-
-
-(* ::Input:: *)
-(*hausdorffdist[estruevals (* Estimated *),trajgrub[discevals] (* True eigenvalues *)]*)
-
-
-(* ::Subsubsection:: *)
-(*Minutia*)
-
-
-(* ::Input:: *)
-(*oldvals = vals;*)
-(*ncases=4;*)
-
-
 (* ::Subsubsection:: *)
 (*Generate coordinates for heatmaps*)
 
@@ -575,29 +512,6 @@ basicolourlist = Array[Hue[#]&,Length@crunchgrub[testdelays],{0,0.7 (* The end o
 
 
 (* ::Subsection:: *)
-(*Estimated eigenvalues: \!\(\*OverscriptBox[\(\[Nu]\), \(^\)]\)*)
-
-
-(* ::Input:: *)
-(*liftgrub[truevals] = estruevals;*)
-(*(* We want the vertical line at the spot where we hit the number of eigenvalues used as the truth in the current analysis *)*)
-(*findnprojsintestdegs = (Flatten[Position[crunchgrub[testdegs],Length[liftgrub[truevals]]]])[[1]];*)
-(**)
-(*vals = ParallelMap[*)
-(*ms1shot4trajvariations[trajgrub, liftgrub, crunchgrub, #] &, *)
-(*{listotseries, listopnoise, oldvals}\[Transpose]*)
-(*];*)
-
-
-(* ::Input:: *)
-(*estimateplots = kmdplots[crunchgrub[testdegs],ratequads,kmdQuality,vals,"KMD-Quality",basicolourlist,delayscolored]*)
-
-
-(* ::Input:: *)
-(*savetheseplots[estimateplots,nametheseplots[#,prefixstrlist["estimatevals_",plotgrub[casestrings]]]&,"png"];*)
-
-
-(* ::Subsection:: *)
 (*True eigenvalues: \sigma(\[CapitalLambda])*)
 
 
@@ -606,14 +520,14 @@ basicolourlist = Array[Hue[#]&,Length@crunchgrub[testdelays],{0,0.7 (* The end o
 (*(* Updating the vertical line for a different set of target eigenvalues *)*)
 (*findnprojsintestdegs = (Flatten[Position[crunchgrub[testdegs],Length[liftgrub[truevals]]]])[[1]];*)
 (**)
-(*valshonest =ParallelMap[*)
+(*vals =ParallelMap[*)
 (*ms1shot4trajvariations[trajgrub, liftgrub, crunchgrub, #] &, *)
-(*{listotseries, listopnoise, oldvals}\[Transpose]*)
+(*{listotseries, listopnoise, vals}\[Transpose]*)
 (*];*)
 
 
 (* ::Input:: *)
-(*truthplots = kmdplots[crunchgrub[testdegs],ratequads,kmdQuality,valshonest,"KMD-Quality",basicolourlist,delayscolored]*)
+(*truthplots = kmdplots[crunchgrub[testdegs],ratequads,kmdQuality,vals,"KMD-Quality",basicolourlist,delayscolored]*)
 
 
 (* ::Input:: *)
@@ -625,7 +539,7 @@ basicolourlist = Array[Hue[#]&,Length@crunchgrub[testdelays],{0,0.7 (* The end o
 
 
 (* ::Input:: *)
-(*DumpSave[crunchgrub[savefile],{oldvals,vals,valshonest,crunchgrub,trajgrub,liftgrub,basicolourlist,listoICs,plotgrub,simsteps,crunchcoords,ncases}];*)
+(*DumpSave[crunchgrub[savefile],{vals,crunchgrub,trajgrub,liftgrub,basicolourlist,listoICs,plotgrub,simsteps,crunchcoords}];*)
 
 
 (* ::PageBreak:: *)

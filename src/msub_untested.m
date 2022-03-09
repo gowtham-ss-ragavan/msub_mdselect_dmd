@@ -50,6 +50,7 @@ onlythequads[vals_] := vals[[All,(* Lose the other Keys as they may not ahve as 
 (* ::Subitem:: *)
 (*Will then need to UpperTriangularize, as we are interested in the smaller being contained in the larger set*)
 
+(* Appears to have a bug when the delays are not sequential...*)
 
 getetvdepwrtcdeg[vals_, cgrubin_] := Module[{cgrub = cgrubin, localetvs, pairdts, plotcoords, zcoords, locvals},
 	(*Common eigenvalues,over ICs and permitted delays,at varying choices of n*)

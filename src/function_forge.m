@@ -1,3 +1,5 @@
+(* ::Package:: *)
+
 (*
  Wolfram Language scrapbook file.
 
@@ -43,17 +45,30 @@ MapThread[getcstar[#1,\[Lambda],sigtols,restols,#2,#3,crows,ndelays]&,datapartsf
 ];
 
 prep4cases[data_, \[Lambda]_, truevals_, sigtols_, restols_, nfunda_, ndelays_, deg_, meff_, noisyQ_] :=
-    Module[ {zmat, zlambdams, zlambdamsdel, n, evalparts, flavours, dataorgs},
+    Module[ {zmat, zlambdams, zlambdamsdel, n, evalparts, flavours, dataorgs,m,msdelgrub,msdelgrubsansmean},
+    	(*Model parameters *)
         n = deg;
+        (* True length of observables*)
+        m = Length[data[[1]]]/(ndelays + 1);
+        (*Actual data matrices to be parsed*)
         zmat = Take[Transpose[data[[1]]], -(n + 1)] // Transpose;
         zlambdams = getmusubeddatamat[zmat, \[Lambda]];
-        zlambdamsdel = 
-         Join @@ Map[#[zlambdams\[Transpose]]\[Transpose] &, {Most, Rest}];
-        evalparts = 
-         getevalpartitions[truevals, nfunda, n, \[Lambda], restols];
-        flavours = {"vanilla", "ms", "mspres", "msdelay"};
+        (* Need to remove the mean, and then take time delays *)
+        (* Pick out the time series as it was before the delays, of appropriate length *)
+        msdelgrub = Take[Transpose[ data[[1,Range[m],All]] ], -(n+1+ndelays)]//Transpose;
+        (* Remove temporal mean *)
+        msdelgrubsansmean = getmusubeddatamat[msdelgrub, \[Lambda]];
+        (* Do delays *)
+        zlambdamsdel = tseries2bigdatamat[(msdelgrubsansmean)\[Transpose], ndelays - 1];
+        evalparts = getevalpartitions[truevals, nfunda, n, \[Lambda], restols];
+        (* Update the eigenvalue target, since the mean was using a matrix of length n+ndelays+1 *)
+        (* True without rate always *)
+        evalparts[[-2]] = (getevalpartitions[truevals, 0, n+ndelays, \[Lambda], restols])[[-1]];
+        (* True with rate always *)
+        evalparts[[-1]] = (getevalpartitions[truevals, n+ndelays+1, n+ndelays, \[Lambda], restols])[[-1]];
+        flavours = {"vanilla", "ms", "msdelay", "msdelay"};
         dataorgs = {zmat (*Usual*), zlambdams (*Mean subtracted*), 
-          zlambdams (*Remove mean-Preserve \[Lambda]*), 
+          zlambdamsdel (*Remove mean-Preserve \[Lambda]*), 
           zlambdamsdel(*Remove mean,then delay*)};
         {dataorgs, evalparts, flavours}
     ] /; (! noisyQ)
@@ -134,7 +149,7 @@ cmat = If[cmatseed == {}(* If unspecified, create using getrandmat *),
 
 
 (* Create the ICs*)
-tseries = rawics.Transpose[cmat] ;
+tseries = rawics . Transpose[cmat] ;
 
 
 
@@ -301,7 +316,7 @@ kmdplots[allXlabels_, key_, fun_, vals_, funname_, colourlist_(**),
           4 <-> 1
           ];
       plots = 
-        Map[stdBWplot[allXlabels, #, colourlist , colorlegend, "n", 
+        Map[stdBWplot[allXlabels, #, colourlist , colorlegend, "Companion-order", 
               funname, vertbounds, vertcolour] &, funnyvals];
       plots
       ]; 

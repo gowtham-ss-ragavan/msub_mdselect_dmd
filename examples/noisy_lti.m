@@ -78,7 +78,7 @@ ltistring = "3";
 (*DMD model order (n) : minn \[LongRightArrow] maxn*)
 
 
-AssociateTo[plotgrub,{testdelays -> {0,3,6,25,50,100,200,400}(*Range[0,28]*)(*Range[6,25]*)(*Join[Range[0,60],{70,80,90,100,200,400}]*), testdegs-> Range[2,25]}];
+AssociateTo[plotgrub,{testdelays -> {0,3,6,25,50,100,200,400}(*Join[{0,3},Range[6,50,2],{100,200,400}]*)(*Join[Range[0,60],{70,80,90,100,200,400}]*), testdegs-> Range[2,25]}];
 
 
 (* ::Subsubsection::Closed:: *)
@@ -481,7 +481,7 @@ tplots
 
 
 (* ::Input:: *)
-(*nicedelayplot = Block[{keep = {1,2,3,4},delayindex =-1,localplot,plotgivename},localplot =stdBWplot[crunchgrub[testdegs],kmdQuals[[keep,delayindex]],algocolours[[keep]],algoscoloured, "n","KMD-Quality",{0,1},Hue[0.8],{{0.98,0.06},{1,0}}];*)
+(*nicedelayplot = Block[{keep = {1,2,3,4},delayindex =-1,localplot,plotgivename},localplot =stdBWplot[crunchgrub[testdegs],kmdQuals[[keep,delayindex]],algocolours[[keep]],algoscoloured, "Companion-order","KMD-Quality",{0,1},Hue[0.8],{{0.98,0.06},{1,0}}];*)
 (*plotgivename = StringJoin["KMDQuality_",ToString[(crunchgrub[testdelays])[[delayindex]]],"_delays"];*)
 (*savetheseplots[{localplot},nametheseplots[#,{plotgivename}]&,"png"];*)
 (*localplot*)
