@@ -47,7 +47,7 @@ AssociateTo[trajgrub, vfield -> "30k"];
 (*Computations*)
 
 
-(* ::Section:: *)
+(* ::Section::Closed:: *)
 (*Temporal parameters*)
 
 
@@ -75,7 +75,7 @@ crunchgrub[maxdelays] = Max@ crunchgrub[testdelays];
 
 
 
-(* ::Subsection::Closed:: *)
+(* ::Subsection:: *)
 (*DS specs*)
 
 
@@ -83,7 +83,7 @@ crunchgrub[maxdelays] = Max@ crunchgrub[testdelays];
 (*AssociateTo[trajgrub, chosenputty -> (#&) ];*)
 
 
-(* ::Subsubsection::Closed:: *)
+(* ::Subsubsection:: *)
 (*Get addresses and load the cavity data*)
 
 
@@ -336,7 +336,7 @@ trajgrub[covmat]= trajgrub[noiseSD]^2*IdentityMatrix[liftgrub[crows]];
 (*(*Abs[trajgrub[discevals]]*)*)
 
 
-(* ::Section:: *)
+(* ::Section::Closed:: *)
 (*Analyse each trajectory, for all possible hyper-parameters.*)
 
 
@@ -413,7 +413,7 @@ trajgrub[covmat]= trajgrub[noiseSD]^2*IdentityMatrix[liftgrub[crows]];
 (*DMD-DFT transition*)
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*Parse data into a matrix form*)
 
 
@@ -443,7 +443,7 @@ trajgrub[covmat]= trajgrub[noiseSD]^2*IdentityMatrix[liftgrub[crows]];
 
 
 (* ::Input:: *)
-(*dmddftdeviationplot = stdBWplot[crunchgrub[testdegs],splog10@ensembledat,basicolourlist,delayscolored,HoldForm[n],HoldForm[Subscript[Log, 10][\!\(\*SubsuperscriptBox[\(\[Delta]\), \(rel\), \(\[Mu]\)]\)]],{-17,1},Transparent]*)
+(*dmddftdeviationplot = stdBWplot[crunchgrub[testdegs],splog10@ensembledat,basicolourlist,delayscolored,"n","\!\(\*SubscriptBox[\(Log\), \(10\)]\)[ Relative distance to DFT ]",{-17,1},Transparent]*)
 
 
 (* ::Input:: *)

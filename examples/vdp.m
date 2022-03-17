@@ -30,7 +30,7 @@ AssociateTo[crunchgrub,savefile ->FileBaseName[NotebookFileName[]](* Name savefi
 crunchgrub[plotdir] = FileNameJoin[{FileNameJoin[Drop[FileNameSplit[NotebookFileName[]],-2]],"plots"}];
 
 
-(* ::Chapter:: *)
+(* ::Chapter::Closed:: *)
 (*Computation*)
 
 
@@ -50,7 +50,7 @@ crunchgrub[plotdir] = FileNameJoin[{FileNameJoin[Drop[FileNameSplit[NotebookFile
 (*DMD model order (n) : minn \[LongRightArrow] maxn*)
 
 
-AssociateTo[plotgrub,{testdelays -> Range[0,28](*{6,25,50,100,200,400}*), testdegs-> Range[2,25]}];
+AssociateTo[plotgrub,{testdelays -> DeleteDuplicates@Join[Range[0,28],Range[30,100,10],Range[100,500,50]](*{6,25,50,100,200,400}*), testdegs-> Range[2,40]}];
 
 
 (* ::Subsubsection::Closed:: *)
@@ -324,7 +324,7 @@ trajgrub[covmat]= trajgrub[noiseSD]^2*IdentityMatrix[liftgrub[crows]];
 (*nICs = #[trajectories] to analyse*)
 
 
-nICs = 50;
+nICs = 100;
 
 
 (* ::Subsubsection::Closed:: *)
@@ -389,7 +389,7 @@ basicolourlist = Array[Hue[#]&,Length@crunchgrub[testdelays],{0,0.7 (* The end o
 (*(*Get[crunchgrub[savefile]];*)*)
 
 
-(* ::Chapter::Closed:: *)
+(* ::Chapter:: *)
 (*Post-processing*)
 
 
@@ -451,7 +451,7 @@ basicolourlist = Array[Hue[#]&,Length@crunchgrub[testdelays],{0,0.7 (* The end o
 
 
 (* ::Input:: *)
-(*dmddftdeviationplot = stdBWplot[crunchgrub[testdegs],splog10@ensembledat,basicolourlist,delayscolored,HoldForm[n],HoldForm[Subscript[Log, 10][\!\(\*SubsuperscriptBox[\(\[Delta]\), \(rel\), \(\[Mu]\)]\)]],{-17,1},Transparent]*)
+(*dmddftdeviationplot = stdBWplot[crunchgrub[testdegs],splog10@ensembledat,basicolourlist,delayscolored,"n","\!\(\*SubscriptBox[\(Log\), \(10\)]\)[ Relative distance to DFT ]",{-17,1},Transparent]*)
 
 
 (* ::Input:: *)
