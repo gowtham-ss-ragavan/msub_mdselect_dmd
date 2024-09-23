@@ -58,7 +58,7 @@ crunchgrub[lticase] = "3";
 (*DMD model order (n) : minn \[LongRightArrow] maxn*)
 
 
-AssociateTo[plotgrub,{testdelays -> Join[{0,3,5,6},{13,20,27}](*Range[0,28]*), testdegs-> Range[2,25]}];
+AssociateTo[plotgrub,{testdelays -> {0, 6, 24}(*Join[{0,3,5,6},{13,20,27}]*)(*Range[0,28]*), testdegs-> Range[2,26]}];
 
 
 (* ::Subsubsection::Closed:: *)
@@ -354,7 +354,7 @@ listotseries = Map[getimeseries[#,trajgrub[vfield],trajgrub[tinit],tfinn,sampack
 listopnoise=Table[Transpose@getIIDnoise[{liftgrub[crows],simsteps+1},trajgrub[basicdist],trajgrub[covmat]],{i,nICs}];
 
 
-(* ::Subsubsection::Closed:: *)
+(* ::Subsubsection:: *)
 (*Initialize colour-scheme for plots*)
 
 
@@ -405,7 +405,7 @@ basicolourlist = Array[Hue[#]&,Length@crunchgrub[testdelays],{0,0.7 (* The end o
 (*Post-processing*)
 
 
-(* ::Subsubsection::Closed:: *)
+(* ::Subsubsection:: *)
 (*Plot travails*)
 
 
@@ -414,7 +414,7 @@ basicolourlist = Array[Hue[#]&,Length@crunchgrub[testdelays],{0,0.7 (* The end o
 
 
 (* ::Input:: *)
-(*delayscolored = BarLegend[{basicolourlist,Through[{Min,Max}[crunchgrub[testdelays]]]},crunchgrub[testdelays],LegendLabel->"#[delays]",LabelStyle->{Directive[Black,15]},LegendMarkerSize->{250}];*)
+(*delayscolored = SwatchLegend[basicolourlist,crunchgrub[testdelays],LegendLabel->"Delays (d)",LabelStyle->{Directive[Black,15]}, LegendLayout->"ReversedColumn", LegendFunction->"Frame"];*)
 
 
 (* ::Text:: *)
@@ -433,7 +433,7 @@ basicolourlist = Array[Hue[#]&,Length@crunchgrub[testdelays],{0,0.7 (* The end o
 (*DMD-DFT transition*)
 
 
-(* ::Subsubsection::Closed:: *)
+(* ::Subsubsection:: *)
 (*Parse data into a matrix form*)
 
 
@@ -464,6 +464,10 @@ basicolourlist = Array[Hue[#]&,Length@crunchgrub[testdelays],{0,0.7 (* The end o
 
 (* ::Input:: *)
 (*dmddftdeviationplot = stdBWplot[crunchgrub[testdegs],splog10@ensembledat,basicolourlist,delayscolored,"Model-order(\[Theta])","\!\(\*SubscriptBox[\(Log\), \(10\)]\)[ Relative distance to DFT ]",{-17,1},Hue[0.8]]*)
+
+
+(* ::Text:: *)
+(**)
 
 
 (* ::Input:: *)
@@ -522,7 +526,7 @@ basicolourlist = Array[Hue[#]&,Length@crunchgrub[testdelays],{0,0.7 (* The end o
 
 
 (* ::Input:: *)
-(*savetheseplots[truthplots,nametheseplots[#,prefixstrlist["truevals_",plotgrub[casestrings]]]&,"png"];*)
+(*(*savetheseplots[truthplots,nametheseplots[#,prefixstrlist["truevals_",plotgrub[casestrings]]]&,"png"];*)*)
 
 
 (* ::Subsubsection:: *)

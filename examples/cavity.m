@@ -30,7 +30,7 @@ Get[FileNameJoin[{Nest[DirectoryName, NotebookFileName[],2],"src","function_forg
 (*Valid options : 13k, 16k, 20k, 30k*)
 
 
-AssociateTo[trajgrub, vfield -> "30k"]; 
+AssociateTo[trajgrub, vfield -> "13k"]; 
 
 
 (* ::Subsubsection::Closed:: *)
@@ -47,11 +47,11 @@ AssociateTo[trajgrub, vfield -> "30k"];
 (*Computations*)
 
 
-(* ::Section::Closed:: *)
+(* ::Section:: *)
 (*Temporal parameters*)
 
 
-(* ::Subsection::Closed:: *)
+(* ::Subsection:: *)
 (*Define the scope of study*)
 
 
@@ -63,7 +63,7 @@ AssociateTo[trajgrub, vfield -> "30k"];
 (*DMD model order (n) : minn \[LongRightArrow] maxn*)
 
 
-AssociateTo[plotgrub,{testdelays -> Range[0,28](*{6,25,50,100,200,400}*), testdegs-> Range[2,25]}];
+AssociateTo[plotgrub,{testdelays -> {0, 12, 25}(*Range[0,28]*)(*{6,25,50,100,200,400}*), testdegs-> Range[2,26]}];
 
 
 (* ::Subsubsection:: *)
@@ -328,12 +328,7 @@ trajgrub[covmat]= trajgrub[noiseSD]^2*IdentityMatrix[liftgrub[crows]];
 (*Initialize colour-scheme for plots*)
 
 
-(* ::Input:: *)
-(*basicolourlist = Array[Hue[#]&,trajgrub[maxdelays]+1,{0,0.7 (* The end of the spectrum before it starts repeating *)}];*)
-
-
-(* ::Input:: *)
-(*(*Abs[trajgrub[discevals]]*)*)
+basicolourlist = Array[Hue[#]&,Length@crunchgrub[testdelays],{0,0.7 (* The end of the spectrum before it starts repeating *)}];
 
 
 (* ::Section::Closed:: *)
@@ -376,7 +371,7 @@ trajgrub[covmat]= trajgrub[noiseSD]^2*IdentityMatrix[liftgrub[crows]];
 (*Post-processing*)
 
 
-(* ::Subsubsection::Closed:: *)
+(* ::Subsubsection:: *)
 (*Plot travails*)
 
 
@@ -385,7 +380,7 @@ trajgrub[covmat]= trajgrub[noiseSD]^2*IdentityMatrix[liftgrub[crows]];
 
 
 (* ::Input:: *)
-(*delayscolored = BarLegend[{basicolourlist,Through[{Min,Max}[crunchgrub[testdelays]]]},crunchgrub[testdelays],LegendLabel->"#[delays]",LabelStyle->{Directive[Black,15]},LegendMarkerSize->{250}];*)
+(*delayscolored = SwatchLegend[basicolourlist,crunchgrub[testdelays],LegendLabel->"Delays (d)",LabelStyle->{Directive[Black,15]}, LegendLayout->"ReversedColumn", LegendFunction->"Frame"];*)
 
 
 (* ::Text:: *)
@@ -447,158 +442,3 @@ trajgrub[covmat]= trajgrub[noiseSD]^2*IdentityMatrix[liftgrub[crows]];
 
 (* ::Input:: *)
 (*stdBWplot[crunchgrub[testdegs],splog10@ensemblechoppeddat,basicolourlist,delayscolored,HoldForm[n],HoldForm[Subscript[Log, 10][Subscript[\[Sigma], Tail]]],{-17,1},Transparent]*)
-
-
-(* ::Section::Closed:: *)
-(*Eigenvalues from multiple time traces : Algorithm 6.1*)
-
-
-(* ::Subsection:: *)
-(*Determining rmin*)
-
-
-(* ::Subsubsection:: *)
-(*Log10[How well is the y-th estimate contained in the x-th estimate] *)
-
-
-(* ::Input:: *)
-(*howtochooseyourrplot =getetvdepwrtcdeg[vals,crunchgrub]*)
-
-
-(*savetheseplots[{howtochooseyourrplot},nametheseplots[#,{"rpyramid"}]&,"png"];*)
-
-
-(* ::Subsection:: *)
-(*Choose  rmin from the earlier diagnostics*)
-
-
-(* ::Item:: *)
-(*Highest y-coordinate, within \hat{r}_{min}: \hat{r}_{max}, with a row of low values*)
-
-
-(* ::Input:: *)
-(*AssociateTo[crunchgrub,{rmin-> Input["Please enter your guess of rmin ('hat{r}')"](* 7*),chosendeg->  Input["Please enter hat{n} to sample hat{r} from "]}];*)
-
-
-(* ::Subsubsection:: *)
-(*Pick data with sufficient delays and extract their common eigenvalues*)
-
-
-(* ::Input:: *)
-(*AssociateTo[crunchgrub,{delaymin-> crunchgrub[chosendeg]-1}];*)
-(*valswithgoodelays=keepthemgoodelays[onlythequads[vals],crunchgrub];*)
-
-
-(* ::Input:: *)
-(*{prunedrootqfs,estruevals}=sneakyestimatetruevals[valswithgoodelays,crunchgrub,"verbose"];*)
-(*Clear[valswithgoodelays];*)
-
-
-(* ::Subsubsection:: *)
-(*Minutia*)
-
-
-(* ::Input:: *)
-(*oldvals = vals;*)
-(*ncases=4;*)
-
-
-(* ::Subsubsection:: *)
-(*Generate coordinates for heatmaps*)
-
-
-(* ::Input:: *)
-(*plotcoords = Flatten[Outer[{##}&,plotgrub[testdelays],plotgrub[testdegs]],1];*)
-(*crunchcoords = Flatten[Outer[{##}&,crunchgrub[testdelays],crunchgrub[testdegs]],1];*)
-
-
-(* ::Section::Closed:: *)
-(*Theorem checks*)
-
-
-(* ::Item:: *)
-(*Each case generates a 4 x 2 table of heat-maps, each plot describing the variation of an averaged quantity with respect to #[delays] and n*)
-
-
-(* ::Subitem:: *)
-(*Columns : \[Rho]_{Subset}, \[Delta]_{Trivial}*)
-
-
-(* ::Subitem:: *)
-(*Rows: Theorems for Vanilla, Mean-subtracted, mspres and msdel*)
-
-
-(* ::Item:: *)
-(*All theorems predict that beyond a critical value of n determined by r (the dimension of the underlying Koopman invariant subspace), all heat maps* should exhibit low values*)
-
-
-(* ::Subitem:: *)
-(*The second row is a little subtle and better explained in the manuscript*)
-
-
-(* ::Subsection:: *)
-(*Estimated eigenvalues: \!\(\*OverscriptBox[\(\[Nu]\), \(^\)]\)*)
-
-
-(* ::Input:: *)
-(*liftgrub[truevals] = estruevals;*)
-(*(* We want the vertical line at the spot where we hit the number of eigenvalues used as the truth in the current analysis *)*)
-(*findnprojsintestdegs = (Flatten[Position[crunchgrub[testdegs],Length[liftgrub[truevals]]]])[[1]];*)
-(**)
-(*vals = ParallelMap[*)
-(*ms1shot4trajvariations[trajgrub, liftgrub, crunchgrub, #] &, *)
-(*{listotseries, listopnoise, oldvals}\[Transpose]*)
-(*];*)
-
-
-(* ::Input:: *)
-(*estimateplots = kmdplots[crunchgrub[testdegs],ratequads,kmdQuality,vals,"KMD-Quality",basicolourlist,delayscolored]*)
-
-
-(* ::Input:: *)
-(*savetheseplots[estimateplots,nametheseplots[#,prefixstrlist["estimatevals_",plotgrub[casestrings]]]&,"png"];*)
-
-
-(* ::Subsubsection:: *)
-(*Save again*)
-
-
-(* ::Input:: *)
-(*DumpSave[crunchgrub[savefile],{oldvals,vals,crunchgrub,trajgrub,liftgrub,basicolourlist,listoICs,plotgrub,simsteps,crunchcoords,ncases}];*)
-
-
-(* ::PageBreak:: *)
-(**)
-
-
-(* ::Chapter::Closed:: *)
-(*Restore-point #2*)
-
-
-(* ::Text:: *)
-(*Complete save-point*)
-
-
-(* ::Input:: *)
-(*(*Get[crunchgrub[savefile]];*)
-(*(* Load the velocityfield data *)*)
-(*Get[trajgrub[prunedata]];*)
-(*(* Generate your trajectories *)*)
-(*listotseries = Map[((velocityfield[cavityPsi])[[All,Range[0,simsteps]+#]])\[Transpose](* Trasnpose coz the cavityPsi is in snapshot form *)&,listoICs];*)
-(*listopnoise=Table[Transpose@getIIDnoise[{liftgrub[crows],simsteps+1},trajgrub[basicdist],trajgrub[covmat]],{i,nICs}];*)
-(**)*)
-
-
-Sort[Abs[estruevals]]
-
-
-(* ::Text:: *)
-(*20k: {0.999255, 1.06807}*)
-
-
-(* ::Text:: *)
-(*16k:  {0.994866, 0.997453}*)
-
-
-(* ::Text:: *)
-(*13k: {0.965107, 0.965107, 0.991791, 0.991791, 0.999884}*)

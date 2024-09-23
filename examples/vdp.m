@@ -50,7 +50,7 @@ crunchgrub[plotdir] = FileNameJoin[{FileNameJoin[Drop[FileNameSplit[NotebookFile
 (*DMD model order (n) : minn \[LongRightArrow] maxn*)
 
 
-AssociateTo[plotgrub,{testdelays -> DeleteDuplicates@Join[Range[0,28],Range[30,100,10],Range[100,500,50]](*{6,25,50,100,200,400}*), testdegs-> Range[2,40]}];
+AssociateTo[plotgrub,{testdelays -> (*DeleteDuplicates@Join[Range[0,28],Range[30,100,10],Range[100,500,50]]*)(*{6,25,50,100,200,400}*){0, 12, 25}, testdegs-> Range[2,26]}];
 
 
 (* ::Subsubsection::Closed:: *)
@@ -366,7 +366,7 @@ basicolourlist = Array[Hue[#]&,Length@crunchgrub[testdelays],{0,0.7 (* The end o
 (*Print[AbsoluteTime[]];*)
 (*vals=ParallelTable[*)
 (*( *)
-(*Print[i];*)
+(*(*Print[i];*)*)
 (*trajgrub[rawics]=listotseries[[i]];*)
 (*	trajgrub[opnoise]=listopnoise[[i]];*)
 (*	meansuboneshot[trajgrub,liftgrub,crunchgrub,<||>]*)
@@ -396,7 +396,7 @@ basicolourlist = Array[Hue[#]&,Length@crunchgrub[testdelays],{0,0.7 (* The end o
 (*Post-processing*)
 
 
-(* ::Subsubsection::Closed:: *)
+(* ::Subsubsection:: *)
 (*Plot travails*)
 
 
@@ -405,7 +405,7 @@ basicolourlist = Array[Hue[#]&,Length@crunchgrub[testdelays],{0,0.7 (* The end o
 
 
 (* ::Input:: *)
-(*delayscolored = BarLegend[{basicolourlist,Through[{Min,Max}[crunchgrub[testdelays]]]},crunchgrub[testdelays],LegendLabel->"#[delays]",LabelStyle->{Directive[Black,15]},LegendMarkerSize->{250}];*)
+(*delayscolored = SwatchLegend[basicolourlist,crunchgrub[testdelays],LegendLabel->"Delays (d)",LabelStyle->{Directive[Black,15]}, LegendLayout->"ReversedColumn", LegendFunction->"Frame"];*)
 
 
 (* ::Text:: *)
