@@ -38,7 +38,7 @@ crunchgrub[lticase] = "3";
 (*crunchgrub[plotdir] = FileNameJoin[{FileNameJoin[Drop[FileNameSplit[NotebookFileName[]],-2]],"plots"}];*)
 
 
-(* ::Chapter::Closed:: *)
+(* ::Chapter:: *)
 (*Computation*)
 
 
@@ -58,7 +58,7 @@ crunchgrub[lticase] = "3";
 (*DMD model order (n) : minn \[LongRightArrow] maxn*)
 
 
-AssociateTo[plotgrub,{testdelays -> (*Join[{0,3,5,6},{13,20,27}]*)Range[0,28], testdegs-> Range[2,25]}];
+AssociateTo[plotgrub,{testdelays -> Join[{0,3,5,6},{13,20,27}](*Range[0,28]*), testdegs-> Range[2,25]}];
 
 
 (* ::Subsubsection::Closed:: *)
@@ -118,7 +118,7 @@ crunchgrub[maxdelays] = Max@ crunchgrub[testdelays];
 ssdim = Length@trajgrub[discevals];
 
 
-(* ::Subsection::Closed:: *)
+(* ::Subsection:: *)
 (*Dictionary specs*)
 
 
@@ -192,7 +192,7 @@ contevals = 1/trajgrub[tsamp]*Log[trajgrub[discevals]];
 generatingAmat = eval2amat[contevals];
 
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*Mean subtraction data*)
 
 
@@ -463,7 +463,7 @@ basicolourlist = Array[Hue[#]&,Length@crunchgrub[testdelays],{0,0.7 (* The end o
 
 
 (* ::Input:: *)
-(*dmddftdeviationplot = stdBWplot[crunchgrub[testdegs],splog10@ensembledat,basicolourlist,delayscolored,"n","\!\(\*SubscriptBox[\(Log\), \(10\)]\)[ Relative distance to DFT ]",{-17,1},Hue[0.8]]*)
+(*dmddftdeviationplot = stdBWplot[crunchgrub[testdegs],splog10@ensembledat,basicolourlist,delayscolored,"Model-order(\[Theta])","\!\(\*SubscriptBox[\(Log\), \(10\)]\)[ Relative distance to DFT ]",{-17,1},Hue[0.8]]*)
 
 
 (* ::Input:: *)
@@ -476,15 +476,6 @@ basicolourlist = Array[Hue[#]&,Length@crunchgrub[testdelays],{0,0.7 (* The end o
 
 (* ::Input:: *)
 (*stdBWplot[crunchgrub[testdegs],splog10@ensemblechoppeddat,basicolourlist,delayscolored,HoldForm[n],HoldForm[Subscript[Log, 10][Subscript[\[Sigma], Tail]]],{-17,1},Hue[0.8]]*)
-
-
-(* ::Subsubsection:: *)
-(*Generate coordinates for heatmaps*)
-
-
-(* ::Input:: *)
-(*plotcoords = Flatten[Outer[{##}&,plotgrub[testdelays],plotgrub[testdegs]],1];*)
-(*crunchcoords = Flatten[Outer[{##}&,crunchgrub[testdelays],crunchgrub[testdegs]],1];*)
 
 
 (* ::Section:: *)
@@ -527,7 +518,7 @@ basicolourlist = Array[Hue[#]&,Length@crunchgrub[testdelays],{0,0.7 (* The end o
 
 
 (* ::Input:: *)
-(*truthplots = kmdplots[crunchgrub[testdegs],ratequads,kmdQuality,vals,"KMD-Quality",basicolourlist,delayscolored]*)
+(*truthplots = kmdplots[crunchgrub[testdegs],ratequads,kmdQuality,vals,"Model-order(\[Theta])","KMD-Quality",basicolourlist,delayscolored]*)
 
 
 (* ::Input:: *)
@@ -556,14 +547,3 @@ basicolourlist = Array[Hue[#]&,Length@crunchgrub[testdelays],{0,0.7 (* The end o
 
 (* ::Input:: *)
 (*(*Get[crunchgrub[savefile]];*)*)
-
-
-Map[Sort[Abs[#]]&,{liftgrub[truevals],estruevals}]
-
-
-(* ::Text:: *)
-(*Case 3: {{0.843196, 0.900726, 0.908183, 1., 1., 1., 1.}, {0.843206, 0.900726, 0.908182, 1., 1., 1., 1.}}*)
-
-
-(* ::Text:: *)
-(*Case "2": {{0.804115, 0.917215, 0.988516, 1.11844, 1.1256, 1.15137, 1.18063}, {1.11844, 1.1256, 1.15137, 1.18064}}*)

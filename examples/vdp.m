@@ -30,7 +30,7 @@ AssociateTo[crunchgrub,savefile ->FileBaseName[NotebookFileName[]](* Name savefi
 crunchgrub[plotdir] = FileNameJoin[{FileNameJoin[Drop[FileNameSplit[NotebookFileName[]],-2]],"plots"}];
 
 
-(* ::Chapter::Closed:: *)
+(* ::Chapter:: *)
 (*Computation*)
 
 
@@ -365,10 +365,13 @@ basicolourlist = Array[Hue[#]&,Length@crunchgrub[testdelays],{0,0.7 (* The end o
 (* ::Input:: *)
 (*Print[AbsoluteTime[]];*)
 (*vals=ParallelTable[*)
-(*(trajgrub[rawics]=listotseries[[i]];*)
-(*trajgrub[opnoise]=listopnoise[[i]];*)
-(*meansuboneshot[trajgrub,liftgrub,crunchgrub,<||>]*)
-(*(*Last bit changes when we have already done one pass,and wish to update our numerical checks*)),*)
+(*( *)
+(*Print[i];*)
+(*trajgrub[rawics]=listotseries[[i]];*)
+(*	trajgrub[opnoise]=listopnoise[[i]];*)
+(*	meansuboneshot[trajgrub,liftgrub,crunchgrub,<||>]*)
+(*(*Last bit changes when we have already done one pass,and wish to update our numerical checks*)*)
+(*),*)
 (*{i,nICs}];*)
 (*Print[AbsoluteTime[]];*)
 
@@ -381,7 +384,7 @@ basicolourlist = Array[Hue[#]&,Length@crunchgrub[testdelays],{0,0.7 (* The end o
 (*DumpSave[crunchgrub[savefile],{vals,crunchgrub,trajgrub,liftgrub,basicolourlist,listoICs,listotseries,plotgrub}];*)
 
 
-(* ::Chapter::Closed:: *)
+(* ::Chapter:: *)
 (*Restore-point #1*)
 
 
@@ -451,7 +454,7 @@ basicolourlist = Array[Hue[#]&,Length@crunchgrub[testdelays],{0,0.7 (* The end o
 
 
 (* ::Input:: *)
-(*dmddftdeviationplot = stdBWplot[crunchgrub[testdegs],splog10@ensembledat,basicolourlist,delayscolored,"n","\!\(\*SubscriptBox[\(Log\), \(10\)]\)[ Relative distance to DFT ]",{-17,1},Transparent]*)
+(*dmddftdeviationplot = stdBWplot[crunchgrub[testdegs],splog10@ensembledat,basicolourlist,delayscolored,"Model-order(\[Theta])","\!\(\*SubscriptBox[\(Log\), \(10\)]\)[ Relative distance to DFT ]",{-17,1},Transparent]*)
 
 
 (* ::Input:: *)

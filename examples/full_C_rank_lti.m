@@ -22,15 +22,11 @@ Get[FileNameJoin[{Nest[DirectoryName, NotebookFileName[],2],"src","function_forg
 {trajgrub,liftgrub,crunchgrub,plotgrub} = Table[<||>,{i,4}];
 
 
-(* ::Subsection:: *)
-(*Savefile // Choice of velocity field*)
+(* ::Subsubsection:: *)
+(*Set LTI case*)
 
 
-(* ::Item:: *)
-(*Valid options : 13k, 16k, 20k, 30k*)
-
-
-AssociateTo[trajgrub, vfield -> "30k"]; 
+crunchgrub[lticase] = "1b";
 
 
 (* ::Subsubsection::Closed:: *)
@@ -38,20 +34,19 @@ AssociateTo[trajgrub, vfield -> "30k"];
 
 
 (* ::Input:: *)
-(*AssociateTo[crunchgrub, savefile -> StringJoin[{FileBaseName[NotebookFileName[]] , "_", trajgrub[vfield]}]];*)
-(**)
+(*AssociateTo[crunchgrub,savefile ->StringJoin[FileBaseName[NotebookFileName[]],"_",crunchgrub[lticase]](* Name savefile after notebook + Case number of LTI system  *) ];*)
 (*crunchgrub[plotdir] = FileNameJoin[{FileNameJoin[Drop[FileNameSplit[NotebookFileName[]],-2]],"plots"}];*)
 
 
 (* ::Chapter:: *)
-(*Computations*)
+(*Computation*)
 
 
-(* ::Section::Closed:: *)
+(* ::Section:: *)
 (*Temporal parameters*)
 
 
-(* ::Subsection::Closed:: *)
+(* ::Subsection:: *)
 (*Define the scope of study*)
 
 
@@ -63,10 +58,10 @@ AssociateTo[trajgrub, vfield -> "30k"];
 (*DMD model order (n) : minn \[LongRightArrow] maxn*)
 
 
-AssociateTo[plotgrub,{testdelays -> Range[0,28](*{6,25,50,100,200,400}*), testdegs-> Range[2,25]}];
+AssociateTo[plotgrub,{testdelays -> (*Join[{0,3,5,6},{13,20,27}]*)Range[0,28], testdegs-> Range[2,25]}];
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*Modify some structs with the given*)
 
 
@@ -75,44 +70,55 @@ crunchgrub[maxdelays] = Max@ crunchgrub[testdelays];
 
 
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*DS specs*)
 
 
+(* ::Item:: *)
+(*LTI*)
+
+
+(* ::Text:: *)
+(*discevals: Discrete time eigenvalues of the LTI system *)
+
+
+(* ::Subitem:: *)
+(*LTI_{1}: Exp[I*2\[Pi]/7*Range[0,6]]*)
+
+
+(* ::Subsubitem:: *)
+(*LTI_{1.5} : Exp[I*2\[Pi]/7*Range[0,6]]*Exp[I*2\[Pi]/14] *)
+
+
+(* ::Subitem:: *)
+(*LTI_{2}: RandomReal[{0.8,1.2},7]*Exp[I*RandomReal[{-\[Pi],\[Pi]},7]]*)
+
+
+(* ::Item:: *)
+(*VDP : x1'=x2,x2'=\epsilon(1-x1^2)x2-x1 .*)
+
+
 (* ::Input:: *)
-(*AssociateTo[trajgrub, chosenputty -> (#&) ];*)
-
-
-(* ::Subsubsection:: *)
-(*Get addresses and load the cavity data*)
+(*plotgrub[casestrings] = {"vanilla","ms","truesansrate","truewithrate"};*)
 
 
 (* ::Input:: *)
-(*AssociateTo[trajgrub, datadir->FileNameJoin[{ParentDirectory[DirectoryName[NotebookFileName[]]],"data"}]]; *)
-
-
-(* ::Input:: *)
-(*AssociateTo[trajgrub,prunedata-> (FileNames[__~~trajgrub[vfield]~~__,FileNameJoin[{trajgrub[datadir],"pruned"}]])[[1]]];*)
-
-
-(* ::Input:: *)
-(*Get[trajgrub[prunedata]];*)
-(**)
-
-
-(* ::Input:: *)
-(*plotgrub[casestrings] = {"vanilla","ms","mspres","msdel"};*)
+(*trajgrub[discevals] = Switch[crunchgrub[lticase],*)
+(*"1a", Exp[I*(2\[Pi])/7*Range[0,6]],*)
+(*"1b",RandomReal[{1,1},7]*Exp[I*RandomReal[{-\[Pi],\[Pi]},7]],*)
+(*"2",RandomReal[{0.8,1.2},7]*Exp[I*RandomReal[{-\[Pi],\[Pi]},7]],*)
+(*"3",Join[RandomReal[{0.8,1},3]*Exp[I*RandomReal[{-\[Pi],\[Pi]},3]],RandomReal[{1,1},4]*Exp[I*RandomReal[{-\[Pi],\[Pi]},4]]]*)
+(*];*)
 
 
 (* ::Subsubsection::Closed:: *)
-(*ssdim:= #[grid-points] that sample*)
+(*ssdim:= Dimension of the LTI = "r"*)
 
 
-(* ::Input:: *)
-(*{ssdim,rawsnapcount}=Dimensions[velocityfield[cavityPsi]];*)
+ssdim = Length@trajgrub[discevals];
 
 
-(* ::Subsection::Closed:: *)
+(* ::Subsection:: *)
 (*Dictionary specs*)
 
 
@@ -140,12 +146,12 @@ crunchgrub[maxdelays] = Max@ crunchgrub[testdelays];
 (*In addition,  crank = ssdim & crows >= ssdim ensures that "C" has full column rank*)
 
 
-AssociateTo[liftgrub,{cmatseed-> {},crank ->(*ssdim *)1, crows -> 1 (**)  , nprojs -> ssdim (* \[LessEqual] ssdim ...tis simply the number of non-zero entires in the IC*)}];
+AssociateTo[liftgrub,{cmatseed-> {},crank ->ssdim (*1*), crows -> 2*ssdim(*1*)   , nprojs -> ssdim (* \[LessEqual] ssdim ...tis simply the number of non-zero entires in the IC*)}];
 
 crunchgrub[meff] = 2*ssdim;
 
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*Sampling time*)
 
 
@@ -161,11 +167,10 @@ crunchgrub[meff] = 2*ssdim;
 (*tsamp: Time step to sample continuous flow*)
 
 
-(* ::Input:: *)
-(*AssociateTo[trajgrub,{tinit -> 0, tsamp -> 0.05}];*)
+AssociateTo[trajgrub,{tinit -> 0, tsamp -> 1}];
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*Generate integrating parameters*)
 
 
@@ -173,6 +178,18 @@ AssociateTo[trajgrub,{maxdelays ->  Max@crunchgrub[testdelays], maxn-> Max@crunc
 
 
 simsteps=2*trajgrub[maxdelays]+trajgrub[maxn]+1+crunchgrub[meff];
+
+
+tfinn = trajgrub[tinit] + trajgrub[tsamp]*simsteps;
+sampackage = {trajgrub[tinit],trajgrub[tsamp],simsteps-1};
+
+
+(* ::Subsubsection::Closed:: *)
+(*Find continuous time version of LTI*)
+
+
+contevals = 1/trajgrub[tsamp]*Log[trajgrub[discevals]];
+generatingAmat = eval2amat[contevals];
 
 
 (* ::Subsection::Closed:: *)
@@ -188,7 +205,7 @@ simsteps=2*trajgrub[maxdelays]+trajgrub[maxn]+1+crunchgrub[meff];
 
 
 (* ::Item:: *)
-(*nfunda : Parameters used to decide when Case 1 can occur, and accordingly change the reference for  \[Rho]_{Subset} and \[Delta]_{Trivial} using  getevalpartitions (See Table 6.1)*)
+(*nfunda : Parameters used to decide when Case 1 can occur, and accordingly change the reference for \[Rho]_{Subset} and \[Delta]_{Trivial} using  getevalpartitions (See Table 6.1)*)
 
 
 (* ::Subitem:: *)
@@ -219,8 +236,36 @@ simsteps=2*trajgrub[maxdelays]+trajgrub[maxn]+1+crunchgrub[meff];
 (*Others: {}*)
 
 
-(* ::Input:: *)
-(*AssociateTo[liftgrub,{rate2sub -> 1,nfunda-> (* Case 2 always *) 2*trajgrub[maxn] (* Impute the number you've rigged the system to have *)(*6*)(* 13*)}];*)
+AssociateTo[liftgrub,{rate2sub -> 1,nfunda-> 2*trajgrub[maxn](* Irrelevant at this point: Just a dummy variable until there is time for a cleanup*)}];
+AssociateTo[liftgrub,truevals-> trajgrub[discevals](* {} if you don't know what it should be, in which case we don't know what mean subtraction does *)]; 
+
+
+(* ::Subsubsection::Closed:: *)
+(*Choice of DS*)
+
+
+(* ::Item:: *)
+(*vfield : Continuous time DS*)
+
+
+(* ::Subitem:: *)
+(*I/P: vector-field[time, coordinate vector ]*)
+
+
+(* ::Item:: *)
+(*chosenputty: Coordinate transform on ODE state into dictionary inputs*)
+
+
+(* ::Subitem:: *)
+(*Redundant for examples in draft*)
+
+
+(* Create a separate one for each DS*)
+locallti[t_(* Time *),r_(* Vector of coordinates*)]:=generatingAmat . r;
+(* Assign vfield*)
+AssociateTo[trajgrub,vfield ->  locallti];
+(* chosenputty: Use to convert coordinates from the ODE version *)
+AssociateTo[trajgrub, chosenputty -> (#&) ];
 
 
 (* ::Subsection::Closed:: *)
@@ -247,11 +292,10 @@ simsteps=2*trajgrub[maxdelays]+trajgrub[maxn]+1+crunchgrub[meff];
 (*[[2]]:  Decide if a coefficient is 0 or not in a c-vector via maketrim*)
 
 
-(* ::Input:: *)
-(*(* Tolerance *)*)
-(*AssociateTo[crunchgrub,{sigtols ->  {10^-8,10^-12} (* Singular values *),*)
-(*restols ->{10^-8,10^-12}(* greaterabsrelcheck *)}];*)
-(*(**)*)
+(* Tolerance *)
+AssociateTo[crunchgrub,{sigtols ->  {10^-8,10^-12} (* Singular values *),
+restols ->{10^-8,10^-12}(* greaterabsrelcheck *)}];
+(**)
 
 
 (* ::Subsubsection::Closed:: *)
@@ -270,8 +314,7 @@ simsteps=2*trajgrub[maxdelays]+trajgrub[maxn]+1+crunchgrub[meff];
 (*( Largest singular value dropped in reduction of X )^tepow*)
 
 
-(* ::Input:: *)
-(*AssociateTo[crunchgrub,{cpow-> 1,tepow-> 1}];*)
+AssociateTo[crunchgrub,{cpow-> 1,tepow-> 1}];
 
 
 (* ::Subsubsection::Closed:: *)
@@ -297,46 +340,28 @@ trajgrub[covmat]= trajgrub[noiseSD]^2*IdentityMatrix[liftgrub[crows]];
 (*nICs = #[trajectories] to analyse*)
 
 
-(* ::Input:: *)
-(*nICs = 50;*)
+nICs = 50;
 
 
-(* ::Subsubsection:: *)
-(*Generate a list of trajectories (special to cavity)*)
+(* ::Subsubsection::Closed:: *)
+(*Generate a list of trajectories*)
 
 
-(* ::Input:: *)
-(*choices4IC =Range[Floor[ 0.8*rawsnapcount]] (* Range[1000] *);*)
-(*(* If choices4IC is too small, will abort*)*)
-(*If[(Max[choices4IC] + simsteps) > rawsnapcount,Print["Insufficient data : make choices4IC OR simsteps smaller"]; Quit[]];*)
-(*(* If nICs is too greedy, will Quit too *)*)
-(*If[ nICs > Length[choices4IC], Print[" Insufficient data: Reduce nICs OR Increase choices4IC"];Quit[]];*)
-(**)
+listoICs= Table[getic[ssdim,liftgrub[nprojs]],{i,nICs}];
+listotseries = Map[getimeseries[#,trajgrub[vfield],trajgrub[tinit],tfinn,sampackage,trajgrub[chosenputty]]&,listoICs];
 
 
-(* ::Input:: *)
-(*(* So, we only store like the start points *)*)
-(*listoICs= RandomSample[choices4IC,nICs];*)
-(*listotseries = Map[((velocityfield[cavityPsi])[[All,Range[0,simsteps]+#]])\[Transpose](* Transpose coz the cavityPsi is in snapshot form *)&,listoICs];*)
+listopnoise=Table[Transpose@getIIDnoise[{liftgrub[crows],simsteps+1},trajgrub[basicdist],trajgrub[covmat]],{i,nICs}];
 
 
-(* ::Input:: *)
-(*listopnoise=Table[Transpose@getIIDnoise[{liftgrub[crows],simsteps+1},trajgrub[basicdist],trajgrub[covmat]],{i,nICs}];*)
-
-
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*Initialize colour-scheme for plots*)
 
 
-(* ::Input:: *)
-(*basicolourlist = Array[Hue[#]&,trajgrub[maxdelays]+1,{0,0.7 (* The end of the spectrum before it starts repeating *)}];*)
+basicolourlist = Array[Hue[#]&,Length@crunchgrub[testdelays],{0,0.7 (* The end of the spectrum before it starts repeating *)}];
 
 
-(* ::Input:: *)
-(*(*Abs[trajgrub[discevals]]*)*)
-
-
-(* ::Section::Closed:: *)
+(* ::Section:: *)
 (*Analyse each trajectory, for all possible hyper-parameters.*)
 
 
@@ -372,6 +397,10 @@ trajgrub[covmat]= trajgrub[noiseSD]^2*IdentityMatrix[liftgrub[crows]];
 (*(*Get[crunchgrub[savefile]];*)*)
 
 
+(* ::PageBreak:: *)
+(**)
+
+
 (* ::Chapter:: *)
 (*Post-processing*)
 
@@ -392,12 +421,12 @@ trajgrub[covmat]= trajgrub[noiseSD]^2*IdentityMatrix[liftgrub[crows]];
 (*Locate position of "r" within degrees("n") being tested*)
 
 
-(* ::Item:: *)
-(*No use for VDP and cavity - > IS this the best inert value it can be given ?*)
-
-
 (* ::Input:: *)
-(*findnprojsintestdegs = (crunchgrub[testdegs])[[1]] ;*)
+(*findnprojsintestdegs = (Flatten[Position[crunchgrub[testdegs],liftgrub[nprojs]]])[[1]];*)
+
+
+(* ::Chapter:: *)
+(*Noise-free plots*)
 
 
 (* ::Section:: *)
@@ -434,7 +463,7 @@ trajgrub[covmat]= trajgrub[noiseSD]^2*IdentityMatrix[liftgrub[crows]];
 
 
 (* ::Input:: *)
-(*dmddftdeviationplot = stdBWplot[crunchgrub[testdegs],splog10@ensembledat,basicolourlist,delayscolored,"Model-order(\[Theta])","\!\(\*SubscriptBox[\(Log\), \(10\)]\)[ Relative distance to DFT ]",{-17,1},Transparent]*)
+(*dmddftdeviationplot = stdBWplot[crunchgrub[testdegs],splog10@ensembledat,basicolourlist,delayscolored,"Model-order(\[Theta])","\!\(\*SubscriptBox[\(Log\), \(10\)]\)[ Relative distance to DFT ]",{-17,1},Hue[0.8]]*)
 
 
 (* ::Input:: *)
@@ -446,73 +475,10 @@ trajgrub[covmat]= trajgrub[noiseSD]^2*IdentityMatrix[liftgrub[crows]];
 
 
 (* ::Input:: *)
-(*stdBWplot[crunchgrub[testdegs],splog10@ensemblechoppeddat,basicolourlist,delayscolored,HoldForm[n],HoldForm[Subscript[Log, 10][Subscript[\[Sigma], Tail]]],{-17,1},Transparent]*)
+(*stdBWplot[crunchgrub[testdegs],splog10@ensemblechoppeddat,basicolourlist,delayscolored,HoldForm[n],HoldForm[Subscript[Log, 10][Subscript[\[Sigma], Tail]]],{-17,1},Hue[0.8]]*)
 
 
-(* ::Section::Closed:: *)
-(*Eigenvalues from multiple time traces : Algorithm 6.1*)
-
-
-(* ::Subsection:: *)
-(*Determining rmin*)
-
-
-(* ::Subsubsection:: *)
-(*Log10[How well is the y-th estimate contained in the x-th estimate] *)
-
-
-(* ::Input:: *)
-(*howtochooseyourrplot =getetvdepwrtcdeg[vals,crunchgrub]*)
-
-
-(*savetheseplots[{howtochooseyourrplot},nametheseplots[#,{"rpyramid"}]&,"png"];*)
-
-
-(* ::Subsection:: *)
-(*Choose  rmin from the earlier diagnostics*)
-
-
-(* ::Item:: *)
-(*Highest y-coordinate, within \hat{r}_{min}: \hat{r}_{max}, with a row of low values*)
-
-
-(* ::Input:: *)
-(*AssociateTo[crunchgrub,{rmin-> Input["Please enter your guess of rmin ('hat{r}')"](* 7*),chosendeg->  Input["Please enter hat{n} to sample hat{r} from "]}];*)
-
-
-(* ::Subsubsection:: *)
-(*Pick data with sufficient delays and extract their common eigenvalues*)
-
-
-(* ::Input:: *)
-(*AssociateTo[crunchgrub,{delaymin-> crunchgrub[chosendeg]-1}];*)
-(*valswithgoodelays=keepthemgoodelays[onlythequads[vals],crunchgrub];*)
-
-
-(* ::Input:: *)
-(*{prunedrootqfs,estruevals}=sneakyestimatetruevals[valswithgoodelays,crunchgrub,"verbose"];*)
-(*Clear[valswithgoodelays];*)
-
-
-(* ::Subsubsection:: *)
-(*Minutia*)
-
-
-(* ::Input:: *)
-(*oldvals = vals;*)
-(*ncases=4;*)
-
-
-(* ::Subsubsection:: *)
-(*Generate coordinates for heatmaps*)
-
-
-(* ::Input:: *)
-(*plotcoords = Flatten[Outer[{##}&,plotgrub[testdelays],plotgrub[testdegs]],1];*)
-(*crunchcoords = Flatten[Outer[{##}&,crunchgrub[testdelays],crunchgrub[testdegs]],1];*)
-
-
-(* ::Section::Closed:: *)
+(* ::Section:: *)
 (*Theorem checks*)
 
 
@@ -537,26 +503,26 @@ trajgrub[covmat]= trajgrub[noiseSD]^2*IdentityMatrix[liftgrub[crows]];
 
 
 (* ::Subsection:: *)
-(*Estimated eigenvalues: \!\(\*OverscriptBox[\(\[Nu]\), \(^\)]\)*)
+(*True eigenvalues: \sigma(\[CapitalLambda])*)
 
 
 (* ::Input:: *)
-(*liftgrub[truevals] = estruevals;*)
-(*(* We want the vertical line at the spot where we hit the number of eigenvalues used as the truth in the current analysis *)*)
+(*liftgrub[truevals] = N@trajgrub[discevals];*)
+(*(* Updating the vertical line for a different set of target eigenvalues *)*)
 (*findnprojsintestdegs = (Flatten[Position[crunchgrub[testdegs],Length[liftgrub[truevals]]]])[[1]];*)
 (**)
-(*vals = ParallelMap[*)
+(*vals =ParallelMap[*)
 (*ms1shot4trajvariations[trajgrub, liftgrub, crunchgrub, #] &, *)
-(*{listotseries, listopnoise, oldvals}\[Transpose]*)
+(*{listotseries, listopnoise, vals}\[Transpose]*)
 (*];*)
 
 
 (* ::Input:: *)
-(*estimateplots = kmdplots[crunchgrub[testdegs],ratequads,kmdQuality,vals,"KMD-Quality",basicolourlist,delayscolored]*)
+(*truthplots = kmdplots[crunchgrub[testdegs],ratequads,kmdQuality,vals,"Model-order(\!\(\*SubscriptBox[\(\[Theta]\), \(ms\)]\))","KMD-Quality",basicolourlist,delayscolored]*)
 
 
 (* ::Input:: *)
-(*savetheseplots[estimateplots,nametheseplots[#,prefixstrlist["estimatevals_",plotgrub[casestrings]]]&,"png"];*)
+(*savetheseplots[truthplots,nametheseplots[#,prefixstrlist["truevals_",plotgrub[casestrings]]]&,"png"];*)
 
 
 (* ::Subsubsection:: *)
@@ -564,14 +530,14 @@ trajgrub[covmat]= trajgrub[noiseSD]^2*IdentityMatrix[liftgrub[crows]];
 
 
 (* ::Input:: *)
-(*DumpSave[crunchgrub[savefile],{oldvals,vals,crunchgrub,trajgrub,liftgrub,basicolourlist,listoICs,plotgrub,simsteps,crunchcoords,ncases}];*)
+(*DumpSave[crunchgrub[savefile],{vals,crunchgrub,trajgrub,liftgrub,basicolourlist,listoICs,plotgrub,simsteps,crunchcoords}];*)
 
 
 (* ::PageBreak:: *)
 (**)
 
 
-(* ::Chapter::Closed:: *)
+(* ::Chapter:: *)
 (*Restore-point #2*)
 
 
@@ -580,25 +546,4 @@ trajgrub[covmat]= trajgrub[noiseSD]^2*IdentityMatrix[liftgrub[crows]];
 
 
 (* ::Input:: *)
-(*(*Get[crunchgrub[savefile]];*)
-(*(* Load the velocityfield data *)*)
-(*Get[trajgrub[prunedata]];*)
-(*(* Generate your trajectories *)*)
-(*listotseries = Map[((velocityfield[cavityPsi])[[All,Range[0,simsteps]+#]])\[Transpose](* Trasnpose coz the cavityPsi is in snapshot form *)&,listoICs];*)
-(*listopnoise=Table[Transpose@getIIDnoise[{liftgrub[crows],simsteps+1},trajgrub[basicdist],trajgrub[covmat]],{i,nICs}];*)
-(**)*)
-
-
-Sort[Abs[estruevals]]
-
-
-(* ::Text:: *)
-(*20k: {0.999255, 1.06807}*)
-
-
-(* ::Text:: *)
-(*16k:  {0.994866, 0.997453}*)
-
-
-(* ::Text:: *)
-(*13k: {0.965107, 0.965107, 0.991791, 0.991791, 0.999884}*)
+(*(*Get[crunchgrub[savefile]];*)*)

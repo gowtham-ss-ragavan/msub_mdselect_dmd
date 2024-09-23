@@ -306,7 +306,7 @@ stdBWplot[allXlabels_, ensembledat_, colourlist_, colorlegend_,
     stdBWplot[allXlabels, ensembledat, colourlist, colorlegend, 
         xlabel, ylabel, vertbounds, vertcolour, After];
 
-kmdplots[allXlabels_, key_, fun_, vals_, funname_, colourlist_(**), 
+kmdplots[allXlabels_, key_, fun_, vals_,xaxisname_, yaxisname_, colourlist_(**), 
    colorlegend_(**), vertbounds_, vertcolour_] := Module[{funnyvals, plots},
       (* Cases, Del, Deg, ICs *)
       funnyvals = Transpose[
@@ -316,14 +316,14 @@ kmdplots[allXlabels_, key_, fun_, vals_, funname_, colourlist_(**),
           4 <-> 1
           ];
       plots = 
-        Map[stdBWplot[allXlabels, #, colourlist , colorlegend, "Companion-order", 
-              funname, vertbounds, vertcolour] &, funnyvals];
+        Map[stdBWplot[allXlabels, #, colourlist , colorlegend, xaxisname, 
+              yaxisname, vertbounds, vertcolour] &, funnyvals];
       plots
       ]; 
 
-kmdplots[allXlabels_, key_, fun_, vals_, funname_, colourlist_(**), 
+kmdplots[allXlabels_, key_, fun_, vals_, xaxisname_,yaxisname_, colourlist_(**), 
    colorlegend_(**)] := 
-   kmdplots[allXlabels, key, fun, vals, funname, colourlist, 
+   kmdplots[allXlabels, key, fun, vals, xaxisname, yaxisname, colourlist, 
    colorlegend(**), {0,1}, Hue[0.8]];
    
 

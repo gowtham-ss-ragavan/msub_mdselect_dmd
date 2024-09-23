@@ -78,7 +78,7 @@ ltistring = "3";
 (*DMD model order (n) : minn \[LongRightArrow] maxn*)
 
 
-AssociateTo[plotgrub,{testdelays -> {0,3,6,25,50,100,200,400}(*Join[{0,3},Range[6,50,2],{100,200,400}]*)(*Join[Range[0,60],{70,80,90,100,200,400}]*), testdegs-> Range[2,25]}];
+AssociateTo[plotgrub,{testdelays -> (*{0,3,6,25,50,100,200,400}*) Join[{0,3},Range[6,50,4],{100,200,400}](*Join[{0,3},Range[6,50,2],{100,200,400}]*)(*Join[Range[0,60],{70,80,90,100,200,400}]*), testdegs-> Range[2,25]}];
 
 
 (* ::Subsubsection::Closed:: *)
@@ -337,7 +337,7 @@ AssociateTo[crunchgrub,{cpow-> 1,tepow-> 1}];
 
 
 trajgrub[basicdist] = UniformDistribution[{-Sqrt[3],Sqrt[3]}] (*1*); (* Zero mean and SD = 1 *)
-trajgrub[noiseSD]= 25;
+trajgrub[noiseSD]= (*5*) 25;
 
 
 trajgrub[covmat]= trajgrub[noiseSD]^2*IdentityMatrix[liftgrub[crows]];
@@ -452,7 +452,7 @@ basicolourlist = Array[Hue[#]&,Length@crunchgrub[testdelays],{0,0.7 (* The end o
 
 
 (* ::Input:: *)
-(*tplots = kmdplots[crunchgrub[testdegs],ratequads,kmdQuality,vals,"KMD-Quality",basicolourlist,delayscolored];*)
+(*tplots = kmdplots[crunchgrub[testdegs],ratequads,kmdQuality,vals,"Model-order(\[Theta])","KMD-Quality",basicolourlist,delayscolored];*)
 
 
 (* ::Input:: *)
@@ -464,6 +464,12 @@ tplots
 
 (* ::Subsection:: *)
 (*Best delay for all cases*)
+
+
+plotgrub[testdelays]
+
+
+trajgrub[discevals] //Abs
 
 
 (* ::Input:: *)
@@ -481,7 +487,7 @@ tplots
 
 
 (* ::Input:: *)
-(*nicedelayplot = Block[{keep = {1,2,3,4},delayindex =-1,localplot,plotgivename},localplot =stdBWplot[crunchgrub[testdegs],kmdQuals[[keep,delayindex]],algocolours[[keep]],algoscoloured, "Companion-order","KMD-Quality",{0,1},Hue[0.8],{{0.98,0.06},{1,0}}];*)
+(*nicedelayplot = Block[{keep = {1,2,3,4},delayindex =6,localplot,plotgivename},localplot =stdBWplot[crunchgrub[testdegs],kmdQuals[[keep,delayindex]],algocolours[[keep]],algoscoloured, "Model-order(\[Theta])","KMD-Quality",{0,1},Hue[0.8],{{0.98,0.06},{1,0}}];*)
 (*plotgivename = StringJoin["KMDQuality_",ToString[(crunchgrub[testdelays])[[delayindex]]],"_delays"];*)
 (*savetheseplots[{localplot},nametheseplots[#,{plotgivename}]&,"png"];*)
 (*localplot*)
