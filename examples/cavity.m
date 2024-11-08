@@ -63,7 +63,7 @@ AssociateTo[trajgrub, vfield -> "13k"];
 (*DMD model order (n) : minn \[LongRightArrow] maxn*)
 
 
-AssociateTo[plotgrub,{testdelays -> {0, 12, 25}(*Range[0,28]*)(*{6,25,50,100,200,400}*), testdegs-> Range[2,26]}];
+AssociateTo[plotgrub,{testdelays -> {3, 12, 25}(*Range[0,28]*)(*{6,25,50,100,200,400}*), testdegs-> Range[2,26]}];
 
 
 (* ::Subsubsection:: *)
@@ -432,13 +432,17 @@ basicolourlist = Array[Hue[#]&,Length@crunchgrub[testdelays],{0,0.7 (* The end o
 (*dmddftdeviationplot = stdBWplot[crunchgrub[testdegs],splog10@ensembledat,basicolourlist,delayscolored,"Model-order(\[Theta])","\!\(\*SubscriptBox[\(Log\), \(10\)]\)[ Relative distance to DFT ]",{-17,1},Transparent]*)
 
 
-(* ::Input:: *)
-(*savetheseplots[{dmddftdeviationplot },nametheseplots[#,{"dmddftdeviation"}]&,"png"];*)
-
-
 (* ::Subsubsection:: *)
 (*Tail of SVD lost in truncation Vs n*)
 
 
 (* ::Input:: *)
-(*stdBWplot[crunchgrub[testdegs],splog10@ensemblechoppeddat,basicolourlist,delayscolored,HoldForm[n],HoldForm[Subscript[Log, 10][Subscript[\[Sigma], Tail]]],{-17,1},Transparent]*)
+(*sigmatailplot =stdBWplot[crunchgrub[testdegs],splog10@ensemblechoppeddat,basicolourlist,delayscolored,"Model-order(\[Theta])",HoldForm[Subscript[Log, 10][Subscript[\[Sigma], Tail]]],{-17,1},Transparent]*)
+
+
+(* ::Subsubsection:: *)
+(*Save both plots above*)
+
+
+(* ::Input:: *)
+(*savetheseplots[{dmddftdeviationplot, sigmatailplot },nametheseplots[#,{"dmddftdeviation", "sigmatail"}]&,"png"];*)

@@ -58,7 +58,7 @@ crunchgrub[lticase] = "3";
 (*DMD model order (n) : minn \[LongRightArrow] maxn*)
 
 
-AssociateTo[plotgrub,{testdelays -> {0, 6, 24}(*Join[{0,3,5,6},{13,20,27}]*)(*Range[0,28]*), testdegs-> Range[2,26]}];
+AssociateTo[plotgrub,{testdelays -> {3, 6, 24}(*Join[{0,3,5,6},{13,20,27}]*)(*Range[0,28]*), testdegs-> Range[2,26]}];
 
 
 (* ::Subsubsection::Closed:: *)
@@ -104,10 +104,10 @@ crunchgrub[maxdelays] = Max@ crunchgrub[testdelays];
 
 (* ::Input:: *)
 (*trajgrub[discevals] = Switch[crunchgrub[lticase],*)
-(*"1a", Exp[I*(2\[Pi])/7*Range[0,6]],*)
+(*"1a", Join[{1},RandomReal[{1,1},6]*Exp[I*RandomReal[{-\[Pi],\[Pi]},6]]],*)
 (*"1b",RandomReal[{1,1},7]*Exp[I*RandomReal[{-\[Pi],\[Pi]},7]],*)
 (*"2",RandomReal[{0.8,1.2},7]*Exp[I*RandomReal[{-\[Pi],\[Pi]},7]],*)
-(*"3",Join[RandomReal[{0.8,1},3]*Exp[I*RandomReal[{-\[Pi],\[Pi]},3]],RandomReal[{1,1},4]*Exp[I*RandomReal[{-\[Pi],\[Pi]},4]]]*)
+(*"3",Join[RandomReal[{0.8,0.9},3]*Exp[I*RandomReal[{-\[Pi],\[Pi]},3]],RandomReal[{1,1},4]*Exp[I*RandomReal[{-\[Pi],\[Pi]},4]]]*)
 (*];*)
 
 
@@ -466,88 +466,17 @@ basicolourlist = Array[Hue[#]&,Length@crunchgrub[testdelays],{0,0.7 (* The end o
 (*dmddftdeviationplot = stdBWplot[crunchgrub[testdegs],splog10@ensembledat,basicolourlist,delayscolored,"Model-order(\[Theta])","\!\(\*SubscriptBox[\(Log\), \(10\)]\)[ Relative distance to DFT ]",{-17,1},Hue[0.8]]*)
 
 
-(* ::Text:: *)
-(**)
-
-
-(* ::Input:: *)
-(*savetheseplots[{dmddftdeviationplot },nametheseplots[#,{"dmddftdeviation"}]&,"png"];*)
-
-
 (* ::Subsubsection:: *)
 (*Tail of SVD lost in truncation Vs n*)
 
 
 (* ::Input:: *)
-(*stdBWplot[crunchgrub[testdegs],splog10@ensemblechoppeddat,basicolourlist,delayscolored,HoldForm[n],HoldForm[Subscript[Log, 10][Subscript[\[Sigma], Tail]]],{-17,1},Hue[0.8]]*)
-
-
-(* ::Section:: *)
-(*Theorem checks*)
-
-
-(* ::Item:: *)
-(*Each case generates a 4 x 2 table of heat-maps, each plot describing the variation of an averaged quantity with respect to #[delays] and n*)
-
-
-(* ::Subitem:: *)
-(*Columns : \[Rho]_{Subset}, \[Delta]_{Trivial}*)
-
-
-(* ::Subitem:: *)
-(*Rows: Theorems for Vanilla, Mean-subtracted, mspres and msdel*)
-
-
-(* ::Item:: *)
-(*All theorems predict that beyond a critical value of n determined by r (the dimension of the underlying Koopman invariant subspace), all heat maps* should exhibit low values*)
-
-
-(* ::Subitem:: *)
-(*The second row is a little subtle and better explained in the manuscript*)
-
-
-(* ::Subsection:: *)
-(*True eigenvalues: \sigma(\[CapitalLambda])*)
-
-
-(* ::Input:: *)
-(*liftgrub[truevals] = N@trajgrub[discevals];*)
-(*(* Updating the vertical line for a different set of target eigenvalues *)*)
-(*findnprojsintestdegs = (Flatten[Position[crunchgrub[testdegs],Length[liftgrub[truevals]]]])[[1]];*)
-(**)
-(*vals =ParallelMap[*)
-(*ms1shot4trajvariations[trajgrub, liftgrub, crunchgrub, #] &, *)
-(*{listotseries, listopnoise, vals}\[Transpose]*)
-(*];*)
-
-
-(* ::Input:: *)
-(*truthplots = kmdplots[crunchgrub[testdegs],ratequads,kmdQuality,vals,"Model-order(\[Theta])","KMD-Quality",basicolourlist,delayscolored]*)
-
-
-(* ::Input:: *)
-(*(*savetheseplots[truthplots,nametheseplots[#,prefixstrlist["truevals_",plotgrub[casestrings]]]&,"png"];*)*)
+(*sigmatailplot = stdBWplot[crunchgrub[testdegs],splog10@ensemblechoppeddat,basicolourlist,delayscolored,"Model-order(\[Theta])",HoldForm[Subscript[Log, 10][Subscript[\[Sigma], Tail]]],{-17,1},Hue[0.8]]*)
 
 
 (* ::Subsubsection:: *)
-(*Save again*)
+(*Save both plots above*)
 
 
 (* ::Input:: *)
-(*DumpSave[crunchgrub[savefile],{vals,crunchgrub,trajgrub,liftgrub,basicolourlist,listoICs,plotgrub,simsteps,crunchcoords}];*)
-
-
-(* ::PageBreak:: *)
-(**)
-
-
-(* ::Chapter:: *)
-(*Restore-point #2*)
-
-
-(* ::Text:: *)
-(*Complete save-point*)
-
-
-(* ::Input:: *)
-(*(*Get[crunchgrub[savefile]];*)*)
+(*savetheseplots[{dmddftdeviationplot, sigmatailplot },nametheseplots[#,{"dmddftdeviation", "sigmatail"}]&,"png"];*)
