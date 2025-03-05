@@ -252,7 +252,7 @@ sampackage = {trajgrub[tinit],trajgrub[tsamp],simsteps-1};
 (*AssociateTo[trajgrub, chosenputty -> (#&) ];*)
 
 
-(* ::Subsection::Closed:: *)
+(* ::Subsection:: *)
 (*Tolerances *)
 
 
@@ -277,7 +277,7 @@ sampackage = {trajgrub[tinit],trajgrub[tsamp],simsteps-1};
 
 
 (* Tolerance *)
-AssociateTo[crunchgrub,{sigtols ->  {10^-8,10^-12} (* Singular values *),
+AssociateTo[crunchgrub,{sigtols ->  {10^-6,10^-12} (* Singular values *),
 restols ->{10^-8,10^-12}(* greaterabsrelcheck *)}];
 (**)
 
@@ -396,7 +396,7 @@ basicolourlist = Array[Hue[#]&,Length@crunchgrub[testdelays],{0,0.7 (* The end o
 (*Post-processing*)
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*Plot travails*)
 
 
@@ -457,12 +457,52 @@ basicolourlist = Array[Hue[#]&,Length@crunchgrub[testdelays],{0,0.7 (* The end o
 (*dmddftdeviationplot = stdBWplot[crunchgrub[testdegs],splog10@ensembledat,basicolourlist,delayscolored,"Model-order(\[Theta])","\!\(\*SubscriptBox[\(Log\), \(10\)]\)[ Relative distance to DFT ]",{-17,1},Transparent]*)
 
 
+(* ::Text:: *)
+(*10^-6*)
+
+
+(* ::Text:: *)
+(*10^-7*)
+
+
+(* ::Text:: *)
+(*5 10^-8*)
+
+
+(* ::Text:: *)
+(*2 10^-8*)
+
+
+(* ::Text:: *)
+(*10^-8*)
+
+
 (* ::Subsubsection:: *)
 (*Tail of SVD lost in truncation Vs n*)
 
 
 (* ::Input:: *)
 (*sigmatailplot =stdBWplot[crunchgrub[testdegs],splog10@ensemblechoppeddat,basicolourlist,delayscolored,"Model-order(\[Theta])",HoldForm[Subscript[Log, 10][Subscript[\[Sigma], Tail]]],{-17,1},Transparent]*)
+
+
+(* ::Text:: *)
+(*10^-6*)
+
+
+(* ::Text:: *)
+(*10^-7*)
+
+
+(* ::Text:: *)
+(*5 10^-8*)
+
+
+(* ::Text:: *)
+(*2 10^-8*)
+
+
+(* ::Text:: *)
+(*10^-8*)
 
 
 (* ::Subsubsection:: *)

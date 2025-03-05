@@ -26,7 +26,7 @@ Get[FileNameJoin[{Nest[DirectoryName, NotebookFileName[],2],"src","function_forg
 (*Set LTI case*)
 
 
-crunchgrub[lticase] = "3";
+crunchgrub[lticase] = "1b";
 
 
 (* ::Subsubsection::Closed:: *)
@@ -268,7 +268,7 @@ AssociateTo[trajgrub,vfield ->  locallti];
 AssociateTo[trajgrub, chosenputty -> (#&) ];
 
 
-(* ::Subsection::Closed:: *)
+(* ::Subsection:: *)
 (*Tolerances *)
 
 
@@ -293,7 +293,7 @@ AssociateTo[trajgrub, chosenputty -> (#&) ];
 
 
 (* Tolerance *)
-AssociateTo[crunchgrub,{sigtols ->  {10^-8,10^-12} (* Singular values *),
+AssociateTo[crunchgrub,{sigtols ->  {2 10^-8,10^-12} (* Singular values *),
 restols ->{10^-8,10^-12}(* greaterabsrelcheck *)}];
 (**)
 
@@ -405,7 +405,7 @@ basicolourlist = Array[Hue[#]&,Length@crunchgrub[testdelays],{0,0.7 (* The end o
 (*Post-processing*)
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*Plot travails*)
 
 
@@ -433,7 +433,7 @@ basicolourlist = Array[Hue[#]&,Length@crunchgrub[testdelays],{0,0.7 (* The end o
 (*DMD-DFT transition*)
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*Parse data into a matrix form*)
 
 
@@ -466,12 +466,40 @@ basicolourlist = Array[Hue[#]&,Length@crunchgrub[testdelays],{0,0.7 (* The end o
 (*dmddftdeviationplot = stdBWplot[crunchgrub[testdegs],splog10@ensembledat,basicolourlist,delayscolored,"Model-order(\[Theta])","\!\(\*SubscriptBox[\(Log\), \(10\)]\)[ Relative distance to DFT ]",{-17,1},Hue[0.8]]*)
 
 
+(* ::Text:: *)
+(*10^-8*)
+
+
+(* ::Text:: *)
+(*2 10^-8*)
+
+
+(* ::Text:: *)
+(*5 10^-8*)
+
+
+(* ::Text:: *)
+(*10^-7*)
+
+
+(* ::Text:: *)
+(*10^-5*)
+
+
 (* ::Subsubsection:: *)
 (*Tail of SVD lost in truncation Vs n*)
 
 
 (* ::Input:: *)
 (*sigmatailplot = stdBWplot[crunchgrub[testdegs],splog10@ensemblechoppeddat,basicolourlist,delayscolored,"Model-order(\[Theta])",HoldForm[Subscript[Log, 10][Subscript[\[Sigma], Tail]]],{-17,1},Hue[0.8]]*)
+
+
+(* ::Text:: *)
+(*2 10^-8*)
+
+
+(* ::Text:: *)
+(*5 10^-8*)
 
 
 (* ::Subsubsection:: *)
